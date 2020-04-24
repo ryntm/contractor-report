@@ -1,0 +1,89 @@
+<div>
+    <h3>Tuition Collection Gigs</h3>
+    <h3>Year: {{ date.year }}</h3>
+    <h3 id="period"></h3>
+<table class="table-sm table-bordered" style="width:75%;padding:10px;">
+
+    <tr>
+        <th>
+            ID
+        </th>
+        <th>
+            Name
+        </th>
+        <th>
+            Hours
+        </th>
+        <th>
+            Cost
+        </th>
+        <th>
+            # of gigs
+        </th>
+        <th>
+            # of tuitions
+        </th>
+        <th>
+            tuitions per hour
+        </th>
+        <th>
+            cost per tuition
+        </th>
+    </tr>
+
+    <script>
+        let tuitionByHours = 0;
+        let tuitionByCost = 0;
+    </script>
+    {{#each data}}
+        <tr>
+            <td>{{this._id}}</td>
+            <td>{{this.name}}</td>
+            <td>{{this.totalhours}}</td>
+            <td>${{this.totalcharges}}</td>
+            <td>{{this.distinctCount}}</td>
+            <td>{{this.tuition_degree_count}}</td>
+            <td id="{{this._id}}hour"></td>
+            <td id="{{this._id}}cost"></td>
+        </tr>
+
+        <script>
+            tuitionByHours = {{ this.tuition_degree_count }}/{{ this.totalhours }};
+            $('#{{this._id}}hour').text(tuitionByHours.toFixed(2));
+            tuitionByCost = {{ this.totalcharges }}/{{ this.tuition_degree_count }};
+            $('#{{this._id}}cost').text("$"+tuitionByCost.toFixed(2));
+        </script>
+
+    {{/each}}
+
+<script>
+    let isQuarter = "{{ date.quarter }}";
+    let isMonth = "{{ date.month }}";
+
+    if (isQuarter.length !== 0) {
+        $("#period").text("Quarter: "+isQuarter)
+        $("#tuitioncollection").attr('href', '/year/{{ date.year }}/quarter/{{ date.quarter }}/tuitioncollection')
+        $("#degreecollection").attr('href', '/year/{{ date.year }}/quarter/{{ date.quarter }}/degreecollection')
+        for (let i = 2014; i < 2021; i++) {
+            $(`#year${i}`).attr('href', `/year/${i}/quarter/{{ date.quarter }}/{{ type.type }}`)
+        }
+    } else if (isMonth.length !== 0) {
+        $("#period").text("Month: "+isMonth)
+        $("#tuitioncollection").attr('href', '/year/{{ date.year }}/month/{{ date.month }}/tuitioncollection')
+        $("#degreecollection").attr('href', '/year/{{ date.year }}/month/{{ date.month }}/degreecollection')
+        for (let i = 2014; i < 2021; i++) {
+            $(`#year${i}`).attr('href', `/year/${i}/month/{{ date.month }}/{{ type.type }}`)
+        }
+    }
+
+    for (let i = 1; i < 13; i++) {
+        $(`#month${i}`).attr('href', `/year/{{ date.year }}/month/${i}/{{ type.type }}`)
+    }
+
+    for (let i = 1; i < 5; i++) {
+        $(`#q${i}`).attr('href', `/year/{{ date.year }}/quarter/${i}/{{ type.type }}`)
+    }
+</script>
+
+</table>
+</div>

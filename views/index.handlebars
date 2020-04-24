@@ -1,0 +1,27 @@
+<div>
+    <h3>Degree Collection Gigs</h3>
+    <h3>Year: {{ date.year }}</h3>
+    <h3>Month: {{ date.month }}</h3>
+<table class="table-sm table-bordered" style="width:50%;padding:10px;">
+
+    <tr>
+        <th>
+            Name
+        </th>
+        <th>
+            # of gigs
+        </th>
+    </tr>
+    {{#each data}}
+        <tr>
+            <td>{{this._id}}</td>
+            <td>{{this.distinctCount}}</td>
+
+        </tr>
+
+
+
+    {{/each}}
+
+</table>
+</div>

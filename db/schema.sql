@@ -1,0 +1,3 @@
+DROP DATABASE IF EXISTS contractorDB;
+
+CREATE DATABASE contractorDB;
