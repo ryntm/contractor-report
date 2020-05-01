@@ -41,59 +41,56 @@ const connection = mongoose.connection;
 connection.once('open', () => {
   console.log('MongoDB connection successful.')
   //here to 
-  connection.db.listCollections().toArray((err, names) => {
-    if (err) {
-      console.log(`Error encountered: ${err}`);
-    } else {
-        db.GigData.remove((err, res) => {
-          if (err) {
-            console.log(err) 
-          } else {
-            console.log(`gigdatas collection was dropped.`)
-            // gig data
-          input
-          .pipe(parser)
-          .on('data', (data) => {results.push(data)})
-          .on('end', () => {
-              db.GigData.create(results)
-              .then(res => {
-                console.log(`${results.length} documents added to gigdatas collection`)
-              })
-              .catch(({ message }) => {
-                console.log(message);
-              });
-            });
-          }
-        })
-        db.UpworkData.remove((err, res) => {
-          if (err) {
-            console.log(err) 
-          } else {
-            console.log(`upworkdatas collection was dropped.`)
-            //upwork data
-            input2
-            .pipe(parser2)
-            .on('data', (data2) => {upworkResults.push(data2);})
-            .on('end', () => {
-                db.UpworkData.create(upworkResults)
-                .then(res => {
-                  console.log(`${upworkResults.length} documents added to upworkdatas collection`)
-                })
-                .catch(({ message }) => {
-                  console.log(message);
-                });
-              });
-          }
-        })
-    }
-  })
+  // connection.db.listCollections().toArray((err, names) => {
+  //   if (err) {
+  //     console.log(`Error encountered: ${err}`);
+  //   } else {
+  //       db.GigData.remove((err, res) => {
+  //         if (err) {
+  //           console.log(err) 
+  //         } else {
+  //           console.log(`gigdatas collection was dropped.`)
+  //           // gig data
+  //         input
+  //         .pipe(parser)
+  //         .on('data', (data) => {results.push(data)})
+  //         .on('end', () => {
+  //             db.GigData.create(results)
+  //             .then(res => {
+  //               console.log(`${results.length} documents added to gigdatas collection`)
+  //             })
+  //             .catch(({ message }) => {
+  //               console.log(message);
+  //             });
+  //           });
+  //         }
+  //       })
+  //       db.UpworkData.remove((err, res) => {
+  //         if (err) {
+  //           console.log(err) 
+  //         } else {
+  //           console.log(`upworkdatas collection was dropped.`)
+  //           //upwork data
+  //           input2
+  //           .pipe(parser2)
+  //           .on('data', (data2) => {upworkResults.push(data2);})
+  //           .on('end', () => {
+  //               db.UpworkData.create(upworkResults)
+  //               .then(res => {
+  //                 console.log(`${upworkResults.length} documents added to upworkdatas collection`)
+  //               })
+  //               .catch(({ message }) => {
+  //                 console.log(message);
+  //               });
+  //             });
+  //         }
+  //       })
+  //   }
+  // })
   // here to not import
 })
 
 //importing data from csvs
-
-
-
 
 
 // Creating express app
@@ -109,15 +106,48 @@ var exphbs = require("express-handlebars");
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 
-app.get('/api', (req, res) => {
-  db.GigData.find({}).limit(100)
-    .then(data => {
-      res.json(data)
-    })
-    .catch(err => {
-      res.json(err)
-    })
-})
+// home is current month's degree collection information
+app.get('/', (req, res) => {
+  let d = new Date();
+  let month = d.getMonth() + 1;
+  let year = d.getFullYear();
+  console.log(month, year)
+  db.GigData.aggregate([
+    { "$match": { submitted_year: year, submitted_month: month, type: "Gig::DegreeCollection" }},
+    { $lookup: {
+      from: "upworkdatas",
+      let: { gig_user_id: "$owner_id"},
+      pipeline: [
+        { "$match": 
+        { 
+          $and: [
+              { year: parseInt(year), month: parseInt(month), activity: "MegaDegreeCollection" }
+              ,
+              { $expr: { $eq: ["$userId", "$$gig_user_id" ] } }
+            ]
+          }
+      }
+      ],
+      as: "upworkData"
+    }},
+    { $group: { _id: "$owner_id", 
+    name: { $first: "$oc_name"},
+    totalhours: { $first: { $sum: "$upworkData.totalhours"}}, 
+    totalcharges: { $first: { $sum: "$upworkData.totalcharges"}}, 
+    degree_gig_count: { $sum: "$degree_gig_count"},
+    distinctCount: { $sum: 1 } } 
+    },
+    { $sort: {"distinctCount": -1 } }
+
+  ]
+    , (err, data) => {
+    if (err) {
+      console.log(err);
+    } else 
+    console.log(data)
+    res.render('degreecollection', { data: data, date: {year: req.params.year, month: req.params.month}, type: { type: "degreecollection"}});
+  });
+});
 
 app.get('/:year', (req, res) => {
   db.GigData.aggregate([
@@ -149,7 +179,7 @@ app.get('/year/:year/degreecollection', (req, res) => {
 });
 
 // degree by year api
-app.get('/api//year/:year/degreecollection', (req, res) => {
+app.get('/api/year/:year/degreecollection', (req, res) => {
   db.GigData.aggregate([
     { "$match": { submitted_year: parseInt(req.params.year), type: "Gig::DegreeCollection" }},
     { $lookup: {
@@ -211,9 +241,47 @@ app.get('/year/:year/month/:month/degreecollection', (req, res) => {
     , (err, data) => {
     if (err) {
       console.log(err);
-    } else 
-    console.log(data)
-    res.render('degreecollection', { data: data, date: {year: req.params.year, month: req.params.month}, type: { type: "degreecollection"}});
+    } else {
+      db.GigData.aggregate([
+        { "$match": { submitted_year: parseInt(req.params.year), submitted_month: parseInt(req.params.month), type: "Gig::DegreeCollection", qa_submitted_month: { $ne: 0} }},
+        { $lookup: {
+          from: "upworkdatas",
+          let: { gig_user_id: "$qa_owner_id"},
+          pipeline: [
+            { "$match": 
+            { 
+              $and: [
+                  { year: parseInt(req.params.year), month: parseInt(req.params.month), activity: "MegaDegreeCollection" }
+                  ,
+                  { $expr: { $eq: ["$userId", "$$gig_user_id" ] } }
+                ]
+              }
+          }
+          ],
+          as: "upworkData"
+        }},
+        { $group: { _id: "$qa_owner_id", 
+        name: { $first: "$qaer_name"},
+        totalhours: { $first: { $sum: "$upworkData.totalhours"}}, 
+        totalcharges: { $first: { $sum: "$upworkData.totalcharges"}}, 
+        degree_gig_count: { $sum: "$degree_gig_count"},
+        distinctCount: { $sum: 1 } } 
+        },
+        { $sort: {"distinctCount": -1 } }
+    
+      ]
+        , (err, qa_data) => {
+        if (err) {
+          console.log(err);
+        } else {
+          
+        }
+        console.log(qa_data)
+        res.render('degreecollection', { data: data, qa_data: qa_data, date: {year: req.params.year, month: req.params.month}, type: { type: "degreecollection"}});
+      });
+    }
+    // console.log(data)
+    // res.render('degreecollection', { data: data, date: {year: req.params.year, month: req.params.month}, type: { type: "degreecollection"}});
   });
 });
 
@@ -250,8 +318,46 @@ app.get('/api/year/:year/month/:month/degreecollection', (req, res) => {
     , (err, data) => {
     if (err) {
       console.log(err);
-    } else 
-    res.json(data);
+    } else {
+      db.GigData.aggregate([
+        { "$match": { submitted_year: parseInt(req.params.year), qa_submitted_month: parseInt(req.params.month), type: "Gig::DegreeCollection", qa_submitted_month: { $ne: 0} }},
+        { $lookup: {
+          from: "upworkdatas",
+          let: { gig_user_id: "$qa_owner_id"},
+          pipeline: [
+            { "$match": 
+            { 
+              $and: [
+                  { year: parseInt(req.params.year), month: parseInt(req.params.month), activity: "MegaDegreeCollection" }
+                  ,
+                  { $expr: { $eq: ["$userId", "$$gig_user_id" ] } }
+                ]
+              }
+          }
+          ],
+          as: "upworkData"
+        }},
+        { $group: { _id: "$qa_owner_id", 
+        name: { $first: "$qaer_name"},
+        totalhours: { $first: { $sum: "$upworkData.totalhours"}}, 
+        totalcharges: { $first: { $sum: "$upworkData.totalcharges"}}, 
+        degree_gig_count: { $sum: "$degree_gig_count"},
+        distinctCount: { $sum: 1 } } 
+        },
+        { $sort: {"distinctCount": -1 } }
+    
+      ]
+        , (err, qa_data) => {
+        if (err) {
+          console.log(err);
+        } 
+        console.log(qa_data)
+        let dataArray = [data, qa_data]
+        res.json(dataArray);
+      });
+    }
+    // console.log(data)
+    // res.render('degreecollection', { data: data, date: {year: req.params.year, month: req.params.month}, type: { type: "degreecollection"}});
   });
 });
 
@@ -380,9 +486,47 @@ app.get('/year/:year/month/:month/tuitioncollection', (req, res) => {
     , (err, data) => {
     if (err) {
       console.log(err);
-    } else 
-    console.log(data)
-    res.render('tuitioncollection', { data: data, date: {year: req.params.year, month: req.params.month}, type: { type: "tuitioncollection"}});
+    } else {
+      db.GigData.aggregate([
+      { "$match": { submitted_year: parseInt(req.params.year), qa_submitted_month: parseInt(req.params.month), type: "Gig::CollegeTuitionCollection", qa_submitted_month: { $ne: 0} }},
+      { $lookup: {
+        from: "upworkdatas",
+        let: { gig_user_id: "$qa_owner_id"},
+        pipeline: [
+          { "$match": 
+          { 
+            $and: [
+                { year: parseInt(req.params.year), month: parseInt(req.params.month), activity: "CollegeTuition" }
+                ,
+                { $expr: { $eq: ["$userId", "$$gig_user_id" ] } }
+              ]
+            }
+        }
+        ],
+        as: "upworkData"
+      }},
+      { $group: { _id: "$qa_owner_id", 
+      name: { $first: "$qaer_name"},
+      totalhours: { $first: { $sum: "$upworkData.totalhours"}}, 
+      totalcharges: { $first: { $sum: "$upworkData.totalcharges"}}, 
+      tuition_degree_count: { $sum: "$tuition_degree_count"},
+      distinctCount: { $sum: 1 } } 
+      },
+      { $sort: {"distinctCount": -1 } }
+  
+    ]
+      , (err, qa_data) => {
+      if (err) {
+        console.log(err);
+      } else {
+        
+      }
+      console.log(qa_data)
+      res.render('tuitioncollection', { data: data, qa_data: qa_data, date: {year: req.params.year, month: req.params.month}, type: { type: "tuitioncollection"}});
+    });
+  }
+    // console.log(data)
+    // res.render('tuitioncollection', { data: data, date: {year: req.params.year, month: req.params.month}, type: { type: "tuitioncollection"}});
   });
 });
 
@@ -417,12 +561,50 @@ app.get('/api/year/:year/month/:month/tuitioncollection', (req, res) => {
 
   ]
     , (err, data) => {
-    if (err) {
-      console.log(err);
-    } else 
-    res.json(data);
+      if (err) {
+        console.log(err);
+      } else {
+        db.GigData.aggregate([
+          { "$match": { submitted_year: parseInt(req.params.year), qa_submitted_month: parseInt(req.params.month), type: "Gig::CollegeTuitionCollection", qa_submitted_month: { $ne: 0} }},
+          { $lookup: {
+            from: "upworkdatas",
+            let: { gig_user_id: "$qa_owner_id"},
+            pipeline: [
+              { "$match": 
+              { 
+                $and: [
+                    { year: parseInt(req.params.year), month: parseInt(req.params.month), activity: "CollegeTuition" }
+                    ,
+                    { $expr: { $eq: ["$userId", "$$gig_user_id" ] } }
+                  ]
+                }
+            }
+            ],
+            as: "upworkData"
+          }},
+          { $group: { _id: "$qa_owner_id", 
+          name: { $first: "$qaer_name"},
+          totalhours: { $first: { $sum: "$upworkData.totalhours"}}, 
+          totalcharges: { $first: { $sum: "$upworkData.totalcharges"}}, 
+          tuition_degree_count: { $sum: "$tuition_degree_count"},
+          distinctCount: { $sum: 1 } } 
+          },
+          { $sort: {"distinctCount": -1 } }
+      
+        ]
+          , (err, qa_data) => {
+          if (err) {
+            console.log(err);
+          } 
+          console.log(qa_data)
+          let dataArray = [data, qa_data]
+          res.json(dataArray);
+        });
+      }
+      // console.log(data)
+      // res.render('degreecollection', { data: data, date: {year: req.params.year, month: req.params.month}, type: { type: "degreecollection"}});
+    });
   });
-});
 
 // tuition by quarter render
 app.get('/year/:year/quarter/:quarter/tuitioncollection', (req, res) => {
@@ -503,38 +685,38 @@ app.get('/api/year/:year/quarter/:quarter/tuitioncollection', (req, res) => {
 
 
 
-app.get('/gigtypes', (req, res) => {
-  db.GigData.aggregate(
-    [
-      // { "$match": { "type": { "$ne": null }} },
+// app.get('/gigtypes', (req, res) => {
+//   db.GigData.aggregate(
+//     [
+//       // { "$match": { "type": { "$ne": null }} },
 
-    { $group: { _id: "$type", distinctCount: { $sum: 1 }} },
-    { $sort: {"distinctCount": -1 } }
-  ]
-    , (err, data) => {
-    if (err) {
-      console.log(err);
-    } else 
-    res.render('index', { data: data })
-  })
-})
+//     { $group: { _id: "$type", distinctCount: { $sum: 1 }} },
+//     { $sort: {"distinctCount": -1 } }
+//   ]
+//     , (err, data) => {
+//     if (err) {
+//       console.log(err);
+//     } else 
+//     res.render('index', { data: data })
+//   })
+// })
 
-app.get('/gigtypes/:year', (req, res) => {
-  let year = req.params.year;
-  db.GigData.aggregate(
-    [
-    { $match: { "submitted_year": parseInt(year)} },
+// app.get('/gigtypes/:year', (req, res) => {
+//   let year = req.params.year;
+//   db.GigData.aggregate(
+//     [
+//     { $match: { "submitted_year": parseInt(year)} },
 
-    { $group: { _id: "$type", distinctCount: { $sum: 1 }}} ,
-    { $sort: {"distinctCount": -1 } }
-  ]
-    , (err, data) => {
-    if (err) {
-      console.log(err);
-    } else 
-    res.render('gigtypesyear', { data: data })
-  })
-})
+//     { $group: { _id: "$type", distinctCount: { $sum: 1 }}} ,
+//     { $sort: {"distinctCount": -1 } }
+//   ]
+//     , (err, data) => {
+//     if (err) {
+//       console.log(err);
+//     } else 
+//     res.render('gigtypesyear', { data: data })
+//   })
+// })
 
 
 app.listen(PORT, function() {

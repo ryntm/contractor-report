@@ -34,6 +34,10 @@
     <script>
         let tuitionByHours = 0;
         let tuitionByCost = 0;
+        let kpiArray = [];
+        let totalCostArray = [];
+        let contractorIDArray = [];
+        let costArray = []
     </script>
     {{#each data}}
         <tr>
@@ -52,11 +56,110 @@
             $('#{{this._id}}hour').text(tuitionByHours.toFixed(2));
             tuitionByCost = {{ this.totalcharges }}/{{ this.tuition_degree_count }};
             $('#{{this._id}}cost').text("$"+tuitionByCost.toFixed(2));
+            kpiArray.push({{ this.tuition_degree_count }});
+            totalCostArray.push({{this.totalcharges}});
+            contractorIDArray.push({{this._id}})
+            costArray.push(tuitionByCost)
         </script>
 
     {{/each}}
 
+</table>
+
+<h1>QA Contractors</h1>
+<table class="table-sm table-bordered" style="width:75%;padding:10px;">
+
+    <tr>
+        <th>
+            ID
+        </th>
+        <th>
+            Name
+        </th>
+        <th>
+            Hours
+        </th>
+        <th>
+            Cost
+        </th>
+        <th>
+            # of gigs
+        </th>
+        <th>
+            # of tuitions
+        </th>
+        <th>
+            tuitions per hour
+        </th>
+        <th>
+            cost per tuition
+        </th>
+    </tr>
+
+    <script>
+        let qa_tuitionByHours = 0;
+        let qa_tuitionByCost = 0;
+        let qa_kpiArray = [];
+        let qa_totalCostArray = [];
+        let qa_contractorIDArray = [];
+        let qa_costArray = []
+    </script>
+    {{#each qa_data}}
+        <tr>
+            <td>{{this._id}}</td>
+            <td>{{this.name}}</td>
+            <td>{{this.totalhours}}</td>
+            <td>${{this.totalcharges}}</td>
+            <td>{{this.distinctCount}}</td>
+            <td>{{this.tuition_degree_count}}</td>
+            <td id="{{this._id}}hour-qa"></td>
+            <td id="{{this._id}}cost-qa"></td>
+        </tr>
+
+        <script>
+            tuitionByHours = {{ this.tuition_degree_count }}/{{ this.totalhours }};
+            $('#{{this._id}}hour-qa').text(tuitionByHours.toFixed(2));
+            tuitionByCost = {{ this.totalcharges }}/{{ this.tuition_degree_count }};
+            $('#{{this._id}}cost-qa').text("$"+tuitionByCost.toFixed(2));
+            qa_kpiArray.push({{ this.tuition_degree_count }});
+            qa_totalCostArray.push({{this.totalcharges}});
+            qa_contractorIDArray.push({{this._id}})
+            qa_costArray.push(qa_tuitionByCost)
+        </script>
+
+    {{/each}}
+
+</table>
+
+
+
+
 <script>
+
+    let totalKPI = kpiArray.reduce(function(a, b) {
+        return a + b
+    }, 0);
+
+    let totalCost = totalCostArray.reduce(function(a, b) {
+        return a + b
+    }, 0);
+
+    let averageCostPerKPI = totalCost / totalKPI
+    let highCostPerKPI = averageCostPerKPI * 1.5
+
+    for (let i = 0; i < contractorIDArray.length; i++) {
+        if (costArray[i] > highCostPerKPI) {
+            $(`#${contractorIDArray[i]}cost`).attr('style', 'background-color: red')
+        }
+    }
+
+    for (let i = 0; i < qa_contractorIDArray.length; i++) {
+    if (qa_costArray[i] > highCostPerKPI) {
+            $(`#${qa_contractorIDArray[i]}cost-qa`).attr('style', 'background-color: red')
+        }
+    }
+
+
     let isQuarter = "{{ date.quarter }}";
     let isMonth = "{{ date.month }}";
 
