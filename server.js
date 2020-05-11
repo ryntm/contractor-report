@@ -10,8 +10,6 @@ var csv = require("csv");
 // Setting up port and requiring models for syncing
 var PORT = process.env.PORT || 8080;
 var db = require("./models")
-// var Gigs = require("./models/gigdata");
-// var Upwork = require("./models/upworkdata");
 
 var input = fs.createReadStream("./db/csv/admin-gig-data.csv");
 var input2 = fs.createReadStream("./db/csv/upwork-data.csv");
@@ -40,53 +38,53 @@ const connection = mongoose.connection;
 
 connection.once('open', () => {
   console.log('MongoDB connection successful.')
-  //here to 
-  connection.db.listCollections().toArray((err, names) => {
-    if (err) {
-      console.log(`Error encountered: ${err}`);
-    } else {
-        db.GigData.remove((err, res) => {
-          if (err) {
-            console.log(err) 
-          } else {
-            console.log(`gigdatas collection was dropped.`)
-            // gig data
-          input
-          .pipe(parser)
-          .on('data', (data) => {results.push(data)})
-          .on('end', () => {
-              db.GigData.create(results)
-              .then(res => {
-                console.log(`${results.length} documents added to gigdatas collection`)
-              })
-              .catch(({ message }) => {
-                console.log(message);
-              });
-            });
-          }
-        })
-        db.UpworkData.remove((err, res) => {
-          if (err) {
-            console.log(err) 
-          } else {
-            console.log(`upworkdatas collection was dropped.`)
-            //upwork data
-            input2
-            .pipe(parser2)
-            .on('data', (data2) => {upworkResults.push(data2);})
-            .on('end', () => {
-                db.UpworkData.create(upworkResults)
-                .then(res => {
-                  console.log(`${upworkResults.length} documents added to upworkdatas collection`)
-                })
-                .catch(({ message }) => {
-                  console.log(message);
-                });
-              });
-          }
-        })
-    }
-  })
+  // here to 
+  // connection.db.listCollections().toArray((err, names) => {
+  //   if (err) {
+  //     console.log(`Error encountered: ${err}`);
+  //   } else {
+  //       db.GigData.deleteMany({}, (err, res) => {
+  //         if (err) {
+  //           console.log(err) 
+  //         } else {
+  //           console.log(`gigdatas collection was dropped.`)
+  //           // gig data
+  //         input
+  //         .pipe(parser)
+  //         .on('data', (data) => {results.push(data)})
+  //         .on('end', () => {
+  //             db.GigData.create(results)
+  //             .then(res => {
+  //               console.log(`${results.length} documents added to gigdatas collection`)
+  //             })
+  //             .catch(({ message }) => {
+  //               console.log(message);
+  //             });
+  //           });
+  //         }
+  //       })
+  //       db.UpworkData.deleteMany({}, (err, res) => {
+  //         if (err) {
+  //           console.log(err) 
+  //         } else {
+  //           console.log(`upworkdatas collection was dropped.`)
+  //           //upwork data
+  //           input2
+  //           .pipe(parser2)
+  //           .on('data', (data2) => {upworkResults.push(data2);})
+  //           .on('end', () => {
+  //               db.UpworkData.create(upworkResults)
+  //               .then(res => {
+  //                 console.log(`${upworkResults.length} documents added to upworkdatas collection`)
+  //               })
+  //               .catch(({ message }) => {
+  //                 console.log(message);
+  //               });
+  //             });
+  //         }
+  //       })
+  //   }
+  // })
   // here to not import
 })
 
@@ -145,73 +143,74 @@ app.get('/', (req, res) => {
       console.log(err);
     } else 
     console.log(data)
-    res.render('degreecollection', { data: data, date: {year: req.params.year, month: req.params.month}, type: { type: "degreecollection"}});
+    res.render('degreecollection', { data: data, date: {year: year, month: month }, type: { type: "degreecollection"}});
   });
 });
 
-app.get('/:year', (req, res) => {
-  db.GigData.aggregate([
-    { "$match": { submitted_year: parseInt(req.params.year) }},
-    { $group: { _id: "$type", distinctCount: { $sum: 1 }} },
-    { $sort: {"distinctCount": -1 } }
-  ]
-    , (err, data) => {
-    if (err) {
-      console.log(err);
-    } else 
-    res.render('index', { data: data });
-  });
-});
+// app.get('/:year', (req, res) => {
+//   db.GigData.aggregate([
+//     { "$match": { submitted_year: parseInt(req.params.year) }},
+//     { $group: { _id: "$type", distinctCount: { $sum: 1 }} },
+//     { $sort: {"distinctCount": -1 } }
+//   ]
+//     , (err, data) => {
+//     if (err) {
+//       console.log(err);
+//     } else 
+//     res.render('index', { data: data });
+//   });
+// });
 
 // degree by year render
-app.get('/year/:year/degreecollection', (req, res) => {
-  db.GigData.aggregate([
-    { "$match": { submitted_year: parseInt(req.params.year), type: "Gig::DegreeCollection" }},
-    { $group: { _id: "$oc_name", distinctCount: { $sum: 1 }} },
-    { $sort: {"distinctCount": -1 } }
-  ]
-    , (err, data) => {
-    if (err) {
-      console.log(err);
-    } else 
-    res.render('degreecollection', { data: data });
-  });
-});
+// app.get('/year/:year/degreecollection', (req, res) => {
+//   db.GigData.aggregate([
+//     { "$match": { submitted_year: parseInt(req.params.year), type: "Gig::DegreeCollection" }},
+//     { $group: { _id: "$oc_name", distinctCount: { $sum: 1 }} },
+//     { $sort: {"distinctCount": -1 } }
+//   ]
+//     , (err, data) => {
+//     if (err) {
+//       console.log(err);
+//     } else 
+//     res.render('degreecollection', { data: data });
+//   });
+// });
 
-// degree by year api
-app.get('/api/year/:year/degreecollection', (req, res) => {
-  db.GigData.aggregate([
-    { "$match": { submitted_year: parseInt(req.params.year), type: "Gig::DegreeCollection" }},
-    { $lookup: {
-      from: "upworkdatas",
-      let: { gig_user_id: "$owner_id"},
-      pipeline: [
-        { "$match": 
-        { 
-          $and: [
-              { year: parseInt(req.params.year), activity: "MegaDegreeCollection" }
-              ,
-              { $expr: { $eq: ["$userId", "$$gig_user_id" ] } }
-            ]
-          }
-      }
-      ],
-      as: "upworkData"
-    }},
-    { $group: { _id: "$oc_name", totalcharges: { $first: { $sum:"$upworkData.totalcharges"}}, distinctCount: { $sum: 1 } } }
-  ]
-    , (err, data) => {
-    if (err) {
-      console.log(err);
-    } else 
-    res.json(data);
-  });
-});
+// // degree by year api
+// app.get('/api/year/:year/degreecollection', (req, res) => {
+//   db.GigData.aggregate([
+//     { "$match": { submitted_year: parseInt(req.params.year), type: "Gig::DegreeCollection" }},
+//     { $lookup: {
+//       from: "upworkdatas",
+//       let: { gig_user_id: "$owner_id"},
+//       pipeline: [
+//         { "$match": 
+//         { 
+//           $and: [
+//               { year: parseInt(req.params.year), activity: "MegaDegreeCollection" }
+//               ,
+//               { $expr: { $eq: ["$userId", "$$gig_user_id" ] } }
+//             ]
+//           }
+//       }
+//       ],
+//       as: "upworkData"
+//     }},
+//     { $group: { _id: "$oc_name", totalcharges: { $first: { $sum:"$upworkData.totalcharges"}}, distinctCount: { $sum: 1 } } }
+//   ]
+//     , (err, data) => {
+//     if (err) {
+//       console.log(err);
+//     } else 
+//     res.json(data);
+//   });
+// });
 
 //degree by month render
 app.get('/year/:year/month/:month/degreecollection', (req, res) => {
   db.GigData.aggregate([
-    { "$match": { submitted_year: parseInt(req.params.year), submitted_month: parseInt(req.params.month), type: "Gig::DegreeCollection" }},
+    { "$match": { submitted_year: parseInt(req.params.year), submitted_month: parseInt(req.params.month), type: "Gig::DegreeCollection" }}
+    ,
     { $lookup: {
       from: "upworkdatas",
       let: { gig_user_id: "$owner_id"},
@@ -242,8 +241,9 @@ app.get('/year/:year/month/:month/degreecollection', (req, res) => {
     if (err) {
       console.log(err);
     } else {
+      console.log(data)
       db.GigData.aggregate([
-        { "$match": { submitted_year: parseInt(req.params.year), submitted_month: parseInt(req.params.month), type: "Gig::DegreeCollection", qa_submitted_month: { $ne: 0} }},
+        { "$match": { qa_submitted_year: parseInt(req.params.year), qa_submitted_month: parseInt(req.params.month), type: "Gig::DegreeCollection" }},
         { $lookup: {
           from: "upworkdatas",
           let: { gig_user_id: "$qa_owner_id"},
@@ -280,15 +280,14 @@ app.get('/year/:year/month/:month/degreecollection', (req, res) => {
         res.render('degreecollection', { data: data, qa_data: qa_data, date: {year: req.params.year, month: req.params.month}, type: { type: "degreecollection"}});
       });
     }
-    // console.log(data)
-    // res.render('degreecollection', { data: data, date: {year: req.params.year, month: req.params.month}, type: { type: "degreecollection"}});
   });
 });
 
 // degree by month api
 app.get('/api/year/:year/month/:month/degreecollection', (req, res) => {
   db.GigData.aggregate([
-    { "$match": { submitted_year: parseInt(req.params.year), submitted_month: parseInt(req.params.month), type: "Gig::DegreeCollection" }},
+    { "$match": { submitted_year: parseInt(req.params.year), submitted_month: parseInt(req.params.month), type: "Gig::DegreeCollection" }}
+    ,
     { $lookup: {
       from: "upworkdatas",
       let: { gig_user_id: "$owner_id"},
@@ -320,7 +319,7 @@ app.get('/api/year/:year/month/:month/degreecollection', (req, res) => {
       console.log(err);
     } else {
       db.GigData.aggregate([
-        { "$match": { submitted_year: parseInt(req.params.year), qa_submitted_month: parseInt(req.params.month), type: "Gig::DegreeCollection", qa_submitted_month: { $ne: 0} }},
+        { "$match": { qa_submitted_year: parseInt(req.params.year), qa_submitted_month: parseInt(req.params.month), type: "Gig::DegreeCollection" }},
         { $lookup: {
           from: "upworkdatas",
           let: { gig_user_id: "$qa_owner_id"},
@@ -720,18 +719,6 @@ app.get('/api/year/:year/quarter/:quarter/tuitioncollection', (req, res) => {
 
 
 app.listen(PORT, function() {
-    // check if we need to import csv values and not run if it already exists
-    // Import csv data after sequelize tables have been initialized
-
-
-
-
-    // db.Questions.findAll().then(result => {
-    //   if (result.length === 0) {
-    //     require("./db/import-questions.js");
-    //   }
-    // });
-
     console.log(
       "==> Listening on port %s. Visit http://localhost:%s/",
       PORT,

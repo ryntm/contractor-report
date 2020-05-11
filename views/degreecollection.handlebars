@@ -2,10 +2,84 @@
     <h3>Degree Collection Gigs</h3>
     <h3>Year: {{ date.year }}</h3>
     <h3 id="period"></h3>
-    <h1>Contractors</h1>
+
+<h1>QA Contractors</h1>
+<table class="table-sm table-bordered" style="width:75%;padding:10px;">
+    
+    <tr>
+        <th>
+            ID
+        </th>
+        <th>
+            Name
+        </th>
+        <th>
+            Hours
+        </th>
+        <th>
+            Cost
+        </th>
+        <th>
+            # of gigs
+        </th>
+        <th>
+            # of degrees
+        </th>
+        <th>
+            degrees per hour
+        </th>
+        <th>
+            cost per degree
+        </th>
+    </tr>
+
+    <script>
+        let kpiArray = [];
+        let qa_degreesByHours = 0;
+        let qa_degreesByCost = 0;
+        let qa_kpiArray = [];
+        let qa_totalCostArray = [];
+        let qa_contractorIDArray = [];
+        let qa_costArray = [];
+    </script>
+    {{#each qa_data}}
+        <tr>
+            <td>{{this._id}}</td>
+            <td>{{this.name}}</td>
+            <td>{{this.totalhours}}</td>
+            <td>${{this.totalcharges}}</td>
+            <td id="{{this._id}}qaer-gig-count">{{this.distinctCount}}</td>
+            <td id="{{this._id}}qaer-kpi-count">{{this.degree_gig_count}}</td>
+            <td id="{{this._id}}hour-qa"></td>
+            <td id="{{this._id}}cost-qa"></td>
+
+        </tr>
+
+        <script>
+            qa_degreesByHours = {{this.degree_gig_count}}/{{this.totalhours}};
+            $('#{{this._id}}hour-qa').text(qa_degreesByHours.toFixed(2));
+            qa_degreesByCost = {{this.totalcharges}}/{{this.degree_gig_count}};
+            $('#{{this._id}}cost-qa').text("$"+qa_degreesByCost.toFixed(2));
+            qa_kpiArray.push({{ this.degree_gig_count }});
+            qa_totalCostArray.push({{this.totalcharges}});
+            qa_contractorIDArray.push({{this._id}})
+            qa_costArray.push(qa_degreesByCost)
+        </script>
+
+    {{/each}}
+
+</table>
+
+<br>
+
+<h1>Regular Contractors</h1>
+
 <table class="table-sm table-bordered" style="width:75%;padding:10px;">
 
     <tr>
+        <th>
+            ID
+        </th>
         <th>
             Name
         </th>
@@ -32,14 +106,15 @@
     <script>
         let degreesByHours = 0;
         let degreesByCost = 0;
-        let kpiArray = [];
+        let gigCountArray = [];
         let totalCostArray = [];
         let contractorIDArray = [];
-        let costArray = []
+        let costArray = [];  
+        let hoursArray = [];
     </script>
     {{#each data}}
-        <tr>
-            {{!-- <td>{{ id }}</td> --}}
+        <tr id="{{this._id}}row">
+            <td>{{this._id}}</td>
             <td>{{this.name}}</td>
             <td>{{this.totalhours}}</td>
             <td>${{this.totalcharges}}</td>
@@ -58,7 +133,9 @@
             kpiArray.push({{ this.degree_gig_count }});
             totalCostArray.push({{this.totalcharges}});
             contractorIDArray.push({{this._id}})
-            costArray.push(degreesByCost)
+            costArray.push(degreesByCost)            
+            gigCountArray.push({{this.distinctCount}})
+            hoursArray.push({{this.totalhours}})
         </script>
 
     {{/each}}
@@ -66,71 +143,28 @@
 </table>
 
 <br>
-
-<h1>QA Contractors</h1>
-<table class="table-sm table-bordered" style="width:75%;padding:10px;">
-    
-    <tr>
-        <th>
-            Name
-        </th>
-        <th>
-            Hours
-        </th>
-        <th>
-            Cost
-        </th>
-        <th>
-            # of gigs
-        </th>
-        <th>
-            # of degrees
-        </th>
-        <th>
-            degrees per hour
-        </th>
-        <th>
-            cost per degree
-        </th>
-    </tr>
-
-    <script>
-        let qa_degreesByHours = 0;
-        let qa_degreesByCost = 0;
-        let qa_kpiArray = [];
-        let qa_totalCostArray = [];
-        let qa_contractorIDArray = [];
-        let qa_costArray = []
-    </script>
-    {{#each qa_data}}
-        <tr>
-            {{!-- <td>{{ id }}</td> --}}
-            <td>{{this.name}}</td>
-            <td>{{this.totalhours}}</td>
-            <td>${{this.totalcharges}}</td>
-            <td>{{this.distinctCount}}</td>
-            <td>{{this.degree_gig_count}}</td>
-            <td id="{{this._id}}hour-qa"></td>
-            <td id="{{this._id}}cost-qa"></td>
-
-        </tr>
-
-        <script>
-            qa_degreesByHours = {{this.degree_gig_count}}/{{this.totalhours}};
-            $('#{{this._id}}hour-qa').text(qa_degreesByHours.toFixed(2));
-            qa_degreesByCost = {{this.totalcharges}}/{{this.degree_gig_count}};
-            $('#{{this._id}}cost-qa').text("$"+qa_degreesByCost.toFixed(2));
-            qa_kpiArray.push({{ this.degree_gig_count }});
-            qa_totalCostArray.push({{this.totalcharges}});
-            qa_contractorIDArray.push({{this._id}})
-            qa_costArray.push(qa_degreesByCost)
-        </script>
-
-    {{/each}}
-
-</table>
+<br>
 
 <script>
+    console.log(gigCountArray)
+    for (let i = 0; i < contractorIDArray.length; i++) {
+        if (qa_contractorIDArray.indexOf(contractorIDArray[i]) >= 0) {
+            console.log('there was a dupe: '+contractorIDArray[i])
+            $(`#${contractorIDArray[i]}row`).remove()
+            let addTheseQaerGigs = parseInt($(`#${contractorIDArray[i]}qaer-gig-count`).text())
+            console.log(addTheseQaerGigs)
+            $(`#${contractorIDArray[i]}qaer-gig-count`).text(addTheseQaerGigs+gigCountArray[i])
+            let addTheseQaerKpis = parseInt($(`#${contractorIDArray[i]}qaer-kpi-count`).text())
+            $(`#${contractorIDArray[i]}qaer-kpi-count`).text(addTheseQaerKpis+kpiArray[i])
+            // redoing and replacing averages dupes
+            let newDegreePerHourAverage = (addTheseQaerKpis+gigCountArray[i]) / hoursArray[i]
+            $(`#${contractorIDArray[i]}hour-qa`).text(newDegreePerHourAverage.toFixed(2));
+            let newCostPerDegree = totalCostArray[i] / (addTheseQaerKpis+kpiArray[i])
+            //console.log(newCostPerDegree)
+            $(`#${contractorIDArray[i]}cost-qa`).text('$'+newCostPerDegree.toFixed(2));
+
+        }
+    }
 
     let totalKPI = kpiArray.reduce(function(a, b) {
         return a + b
@@ -142,21 +176,29 @@
 
     let averageCostPerKPI = totalCost / totalKPI
     let highCostPerKPI = averageCostPerKPI * 1.5
+    console.log("cost per KPI too high: "+highCostPerKPI)
 
     for (let i = 0; i < contractorIDArray.length; i++) {
         if (costArray[i] > highCostPerKPI) {
+            console.log(`${costArray[i]} -- reg contractor: ${contractorIDArray[i]}`)
             $(`#${contractorIDArray[i]}cost`).attr('style', 'background-color: red')
         }
     }
 
     for (let i = 0; i < qa_contractorIDArray.length; i++) {
     if (qa_costArray[i] > highCostPerKPI) {
+            console.log(`${qa_costArray[i]} -- QAer contractor: ${qa_contractorIDArray[i]}`)
+
             $(`#${qa_contractorIDArray[i]}cost-qa`).attr('style', 'background-color: red')
         }
     }
 
     let isQuarter = "{{ date.quarter }}";
     let isMonth = "{{ date.month }}";
+    let link = "";
+
+    $("#degreecollection-button").attr('style', 'background-color: white; color: gray;')
+
 
     if (isQuarter.length !== 0) {
         $("#period").text("Quarter: "+isQuarter)
@@ -164,6 +206,10 @@
         $("#degreecollection").attr('href', '/year/{{ date.year }}/quarter/{{ date.quarter }}/degreecollection')
         for (let i = 2014; i < 2021; i++) {
             $(`#year${i}`).attr('href', `/year/${i}/quarter/{{ date.quarter }}/{{ type.type }}`)
+            link = "http://localhost:8080"+$(`#year${i}`).attr('href');
+            if (link === location.href) {
+            $(`#yearlink${i}`).attr('style', 'background-color: white; color: gray')
+            } 
         }
     } else if (isMonth.length !== 0) {
         $("#period").text("Month: "+isMonth)
@@ -171,6 +217,10 @@
         $("#degreecollection").attr('href', '/year/{{ date.year }}/month/{{ date.month }}/degreecollection')
         for (let i = 2014; i < 2021; i++) {
             $(`#year${i}`).attr('href', `/year/${i}/month/{{ date.month }}/{{ type.type }}`)
+            link = "http://localhost:8080"+$(`#year${i}`).attr('href');
+            if (link === location.href) {
+            $(`#yearlink${i}`).attr('style', 'background-color: white; color: gray;')
+            }
         }
     } else {
         $("#period").text("Month: "+isMonth)
@@ -183,10 +233,18 @@
 
     for (let i = 1; i < 13; i++) {
         $(`#month${i}`).attr('href', `/year/{{ date.year }}/month/${i}/{{ type.type }}`)
+        link = "http://localhost:8080"+$(`#month${i}`).attr('href');
+        if (link === location.href) {
+            $(`#monthlink${i}`).attr('style', 'background-color: white; color: gray;')
+        }
     }
 
     for (let i = 1; i < 5; i++) {
         $(`#q${i}`).attr('href', `/year/{{ date.year }}/quarter/${i}/{{ type.type }}`)
+        link = "http://localhost:8080"+$(`#q${i}`).attr('href');
+        if (link === location.href) {
+            $(`#quarterlink${i}`).attr('style', 'background-color: white; color: gray;')
+        } 
     }
 </script>
 
