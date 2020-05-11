@@ -206,7 +206,7 @@
         $("#degreecollection").attr('href', '/year/{{ date.year }}/quarter/{{ date.quarter }}/degreecollection')
         for (let i = 2014; i < 2021; i++) {
             $(`#year${i}`).attr('href', `/year/${i}/quarter/{{ date.quarter }}/{{ type.type }}`)
-            link = "https://rocky-reef-60993.herokuapp.com/"+$(`#year${i}`).attr('href');
+            link = "https://rocky-reef-60993.herokuapp.com"+$(`#year${i}`).attr('href');
             if (link === location.href) {
             $(`#yearlink${i}`).attr('style', 'background-color: white; color: gray')
             } 
@@ -217,7 +217,7 @@
         $("#degreecollection").attr('href', '/year/{{ date.year }}/month/{{ date.month }}/degreecollection')
         for (let i = 2014; i < 2021; i++) {
             $(`#year${i}`).attr('href', `/year/${i}/month/{{ date.month }}/{{ type.type }}`)
-            link = "https://rocky-reef-60993.herokuapp.com/"+$(`#year${i}`).attr('href');
+            link = "https://rocky-reef-60993.herokuapp.com"+$(`#year${i}`).attr('href');
             if (link === location.href) {
             $(`#yearlink${i}`).attr('style', 'background-color: white; color: gray;')
             }
