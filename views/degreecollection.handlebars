@@ -233,7 +233,7 @@
 
     for (let i = 1; i < 13; i++) {
         $(`#month${i}`).attr('href', `/year/{{ date.year }}/month/${i}/{{ type.type }}`)
-        link = "http://localhost:8080"+$(`#month${i}`).attr('href');
+        link = "https://rocky-reef-60993.herokuapp.com"+$(`#month${i}`).attr('href');
         if (link === location.href) {
             $(`#monthlink${i}`).attr('style', 'background-color: white; color: gray;')
         }
@@ -241,7 +241,7 @@
 
     for (let i = 1; i < 5; i++) {
         $(`#q${i}`).attr('href', `/year/{{ date.year }}/quarter/${i}/{{ type.type }}`)
-        link = "http://localhost:8080"+$(`#q${i}`).attr('href');
+        link = "https://rocky-reef-60993.herokuapp.com"+$(`#q${i}`).attr('href');
         if (link === location.href) {
             $(`#quarterlink${i}`).attr('style', 'background-color: white; color: gray;')
         } 
