@@ -170,6 +170,9 @@
             //console.log(newCostPerDegree)
             $(`#${contractorIDArray[i]}cost-qa`).text('$'+newCostPerDegree.toFixed(2));
 
+            // splicing/replacing the cost array entry with new average into qacontractoridarray
+            qa_costArray.splice(qa_contractorIDArray.indexOf(contractorIDArray[i]), 1, newCostPerDegree)
+
         }
     }
 
@@ -183,6 +186,7 @@
 
     let averageCostPerKPI = totalCost / totalKPI
     let highCostPerKPI = averageCostPerKPI * 1.5
+    console.log()
     console.log("cost per KPI too high: "+highCostPerKPI)
 
     for (let i = 0; i < contractorIDArray.length; i++) {
