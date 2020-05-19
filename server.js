@@ -39,52 +39,52 @@ const connection = mongoose.connection;
 connection.once('open', () => {
   console.log('MongoDB connection successful.')
   // here to 
-  // connection.db.listCollections().toArray((err, names) => {
-  //   if (err) {
-  //     console.log(`Error encountered: ${err}`);
-  //   } else {
-  //       db.GigData.deleteMany({}, (err, res) => {
-  //         if (err) {
-  //           console.log(err) 
-  //         } else {
-  //           console.log(`gigdatas collection was dropped.`)
-  //           // gig data
-  //         input
-  //         .pipe(parser)
-  //         .on('data', (data) => {results.push(data)})
-  //         .on('end', () => {
-  //             db.GigData.create(results)
-  //             .then(res => {
-  //               console.log(`${results.length} documents added to gigdatas collection`)
-  //             })
-  //             .catch(({ message }) => {
-  //               console.log(message);
-  //             });
-  //           });
-  //         }
-  //       })
-  //       db.UpworkData.deleteMany({}, (err, res) => {
-  //         if (err) {
-  //           console.log(err) 
-  //         } else {
-  //           console.log(`upworkdatas collection was dropped.`)
-  //           //upwork data
-  //           input2
-  //           .pipe(parser2)
-  //           .on('data', (data2) => {upworkResults.push(data2);})
-  //           .on('end', () => {
-  //               db.UpworkData.create(upworkResults)
-  //               .then(res => {
-  //                 console.log(`${upworkResults.length} documents added to upworkdatas collection`)
-  //               })
-  //               .catch(({ message }) => {
-  //                 console.log(message);
-  //               });
-  //             });
-  //         }
-  //       })
-  //   }
-  // })
+  connection.db.listCollections().toArray((err, names) => {
+    if (err) {
+      console.log(`Error encountered: ${err}`);
+    } else {
+        db.GigData.deleteMany({}, (err, res) => {
+          if (err) {
+            console.log(err) 
+          } else {
+            console.log(`gigdatas collection was dropped.`)
+            // gig data
+          input
+          .pipe(parser)
+          .on('data', (data) => {results.push(data)})
+          .on('end', () => {
+              db.GigData.create(results)
+              .then(res => {
+                console.log(`${results.length} documents added to gigdatas collection`)
+              })
+              .catch(({ message }) => {
+                console.log(message);
+              });
+            });
+          }
+        })
+        db.UpworkData.deleteMany({}, (err, res) => {
+          if (err) {
+            console.log(err) 
+          } else {
+            console.log(`upworkdatas collection was dropped.`)
+            //upwork data
+            input2
+            .pipe(parser2)
+            .on('data', (data2) => {upworkResults.push(data2);})
+            .on('end', () => {
+                db.UpworkData.create(upworkResults)
+                .then(res => {
+                  console.log(`${upworkResults.length} documents added to upworkdatas collection`)
+                })
+                .catch(({ message }) => {
+                  console.log(message);
+                });
+              });
+          }
+        })
+    }
+  })
   // here to not import
 })
 
@@ -390,12 +390,47 @@ app.get('/year/:year/quarter/:quarter/degreecollection', (req, res) => {
     { $sort: {"degree_gig_count": -1 } }
 
   ]
-    , (err, data) => {
+  , (err, data) => {
     if (err) {
       console.log(err);
-    } else 
-    console.log(data)
-    res.render('degreecollection', { data: data, date: {year: req.params.year, quarter: req.params.quarter}, type: { type: "degreecollection"}});
+    } else {
+      db.GigData.aggregate([
+        { "$match": { qa_submitted_year: parseInt(req.params.year), qa_submitted_quarter: parseInt(req.params.quarter), type: "Gig::DegreeCollection" }},
+        { $lookup: {
+          from: "upworkdatas",
+          let: { gig_user_id: "$qa_owner_id"},
+          pipeline: [
+            { "$match": 
+            { 
+              $and: [
+                  { year: parseInt(req.params.year), quarter: parseInt(req.params.quarter), activity: "MegaDegreeCollection" }
+                  ,
+                  { $expr: { $eq: ["$userId", "$$gig_user_id" ] } }
+                ]
+              }
+          }
+          ],
+          as: "upworkData"
+        }},
+        { $group: { _id: "$qa_owner_id", 
+        name: { $first: "$qaer_name"},
+        totalhours: { $first: { $sum: "$upworkData.totalhours"}}, 
+        totalcharges: { $first: { $sum: "$upworkData.totalcharges"}}, 
+        degree_gig_count: { $sum: "$degree_gig_count"},
+        distinctCount: { $sum: 1 } } 
+        },
+        { $sort: {"distinctCount": -1 } }
+    
+      ]
+        , (err, qa_data) => {
+        if (err) {
+          console.log(err);
+        } 
+        console.log(qa_data)
+        res.render('degreecollection', { data: data, qa_data: qa_data, date: {year: req.params.year, quarter: req.params.quarter}, type: { type: "degreecollection"}});      });
+    }
+    // console.log(data)
+    // res.render('degreecollection', { data: data, date: {year: req.params.year, month: req.params.month}, type: { type: "degreecollection"}});
   });
 });
 

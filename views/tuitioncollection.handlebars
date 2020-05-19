@@ -108,6 +108,7 @@
         let tuitionByHours = 0;
         let tuitionByCost = 0;
         let gigCountArray = [];
+        let totalCostArray = [];
         let contractorIDArray = [];
         let costArray = [];
         let hoursArray = [];
@@ -135,7 +136,6 @@
             costArray.push(tuitionByCost)
             gigCountArray.push({{ this.distinctCount }})
             hoursArray.push({{this.totalhours}})
-
         </script>
 
     {{/each}}
@@ -149,12 +149,19 @@
     console.log(gigCountArray)
     for (let i = 0; i < contractorIDArray.length; i++) {
         if (qa_contractorIDArray.indexOf(contractorIDArray[i]) >= 0) {
-            console.log('there was a dupe')
+            console.log('there was a dupe'+contractorIDArray[i])
+            // removes the row in the regular contractor table
             $(`#${contractorIDArray[i]}row`).remove()
+
+            // getting gig count from the QAer table of the duplicate contractor
             let addTheseQaerGigs = parseInt($(`#${contractorIDArray[i]}qaer-gig-count`).text())
             $(`#${contractorIDArray[i]}qaer-gig-count`).text(addTheseQaerGigs+gigCountArray[i])
+
+            // getting kpi  count from the QAer table of the duplicate contractor
             let addTheseQaerKpis = parseInt($(`#${contractorIDArray[i]}qaer-kpi-count`).text())
             $(`#${contractorIDArray[i]}qaer-kpi-count`).text(addTheseQaerKpis+kpiArray[i])
+
+
             // redoing averages
             let newTuitionPerHourAverage = (addTheseQaerKpis+gigCountArray[i]) / hoursArray[i]
             $(`#${contractorIDArray[i]}hour-qa`).text(newTuitionPerHourAverage.toFixed(2));
@@ -195,6 +202,7 @@
     let isQuarter = "{{ date.quarter }}";
     let isMonth = "{{ date.month }}";
     let link = "";
+    let localLink = "";
 
     if (isQuarter.length !== 0) {
         $("#period").text("Quarter: "+isQuarter)
@@ -202,10 +210,13 @@
         $("#degreecollection").attr('href', '/year/{{ date.year }}/quarter/{{ date.quarter }}/degreecollection')
         for (let i = 2014; i < 2021; i++) {
             $(`#year${i}`).attr('href', `/year/${i}/quarter/{{ date.quarter }}/{{ type.type }}`)
-            link = "http://localhost:8080"+$(`#year${i}`).attr('href');
+            link = "https://rocky-reef-60993.herokuapp.com"+$(`#year${i}`).attr('href');
+            localLink = "http://localhost:8080"+$(`#year${i}`).attr('href')
             if (link === location.href) {
-            $(`#yearlink${i}`).attr('style', 'background-color: white; color: gray;')
-            } 
+                $(`#yearlink${i}`).attr('style', 'background-color: white; color: gray;')
+            } else if (localLink === location.href) {
+                $(`#yearlink${i}`).attr('style', 'background-color: white; color: gray')
+            }
         }
     } else if (isMonth.length !== 0) {
         $("#period").text("Month: "+isMonth)
@@ -213,9 +224,12 @@
         $("#degreecollection").attr('href', '/year/{{ date.year }}/month/{{ date.month }}/degreecollection')
         for (let i = 2014; i < 2021; i++) {
             $(`#year${i}`).attr('href', `/year/${i}/month/{{ date.month }}/{{ type.type }}`)
-            link = "http://localhost:8080"+$(`#year${i}`).attr('href');
+            link = "https://rocky-reef-60993.herokuapp.com"+$(`#year${i}`).attr('href');            
+            localLink = "http://localhost:8080"+$(`#year${i}`).attr('href');
             if (link === location.href) {
-            $(`#yearlink${i}`).attr('style', 'background-color: white; color: gray;')
+                $(`#yearlink${i}`).attr('style', 'background-color: white; color: gray;')
+            } else if (localLink === location.href) {
+                $(`#yearlink${i}`).attr('style', 'background-color: white; color: gray;')
             }
         }
     }
@@ -223,18 +237,25 @@
 
     for (let i = 1; i < 13; i++) {
         $(`#month${i}`).attr('href', `/year/{{ date.year }}/month/${i}/{{ type.type }}`)
-        link = "http://localhost:8080"+$(`#month${i}`).attr('href');
+        link = "https://rocky-reef-60993.herokuapp.com"+$(`#month${i}`).attr('href');
+        localLink = "http://localhost:8080"+$(`#month${i}`).attr('href');
         if (link === location.href) {
-            $(`#monthlink${i}`).attr('style', 'background-color: white; color: gray;')
+            $(`#monthlink${i}`).attr('style', 'background-color: white; color: gray;');
+        } else if (localLink === location.href) {
+            $(`#monthlink${i}`).attr('style', 'background-color: white; color: gray;');
+
         }
     }
 
     for (let i = 1; i < 5; i++) {
         $(`#q${i}`).attr('href', `/year/{{ date.year }}/quarter/${i}/{{ type.type }}`)
         link = "http://localhost:8080"+$(`#q${i}`).attr('href');
+        localLink = "http://localhost:8080"+$(`#q${i}`).attr('href')
         if (link === location.href) {
             $(`#quarterlink${i}`).attr('style', 'background-color: white; color: gray;')
-        }        
+        } else if (localLink === location.href) {
+            $(`#quarterlink${i}`).attr('style', 'background-color: white; color: gray;')
+        }
     }
 
 
