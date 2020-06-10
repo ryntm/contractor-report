@@ -41,6 +41,8 @@
         let qa_totalCostArray = [];
         let qa_contractorIDArray = [];
         let qa_costArray = [];
+        let qa_totalHours = [];
+        let qa_totalGigs = [];
     </script>
     {{#each qa_data}}
         <tr>
@@ -62,11 +64,22 @@
             $('#{{this._id}}cost-qa').text("$"+qa_degreesByCost.toFixed(2));
             qa_kpiArray.push({{ this.degree_gig_count }});
             qa_totalCostArray.push({{this.totalcharges}});
-            qa_contractorIDArray.push({{this._id}})
-            qa_costArray.push(qa_degreesByCost)
+            qa_contractorIDArray.push({{this._id}});
+            qa_costArray.push(qa_degreesByCost);
+            qa_totalHours.push({{this.totalhours}});
+            qa_totalGigs.push({{this.distinctCount}});
         </script>
 
     {{/each}}
+        <td class="total-row">Total</td>
+        <td>--</td>
+        <td id="qa-total-hours"></td>
+        <td id="qa-total-cost"></td>
+        <td id="qa-total-gigs"></td>
+        <td id="qa-total-degrees"></td>
+        <td id="qa-degrees-per-hour"></td>
+        <td id="qa-cost-per-degree"></td>
+    </tr>
 
 </table>
 
@@ -111,6 +124,7 @@
         let contractorIDArray = [];
         let costArray = [];  
         let hoursArray = [];
+        let gigsArray = [];
     </script>
     {{#each data}}
         <tr id="{{this._id}}row">
@@ -136,18 +150,76 @@
             costArray.push(degreesByCost)            
             gigCountArray.push({{this.distinctCount}})
             hoursArray.push({{this.totalhours}})
+            gigsArray.push({{this.distinctCount}})
         </script>
 
     {{/each}}
+    <tr class="total-row">
+        <td>Total</td>
+        <td>--</td>
+        <td id="total-hours"></td>
+        <td id="total-cost"></td>
+        <td id="total-gigs"></td>
+        <td id="total-degrees"></td>
+        <td id="degrees-per-hour"></td>
+        <td id="cost-per-degree"></td>
+    </tr>
 
 </table>
+
+<br>
+
+
+<h1>Comparisons</h1>
+<span>All-time degrees collected and money spent and all-time information from the same time last year</span>
+
+<table class="table-sm table-bordered" style="width:75%;padding:10px;">
+
+    <tr>
+        <th>
+            Year
+        </th>
+        <th>
+            # of gigs
+        </th>
+        <th>
+            # of degrees
+        </th>
+        <th>
+            total cost
+        </th>
+        <th>
+            cost per degree
+        </th>
+    </tr>
+
+    <tr>
+        <td id="this-year-comparison"></td>
+        <td id="this-year-gig-total"></td>
+        <td id="this-year-degree-total"></td>
+        <td id="this-year-total-cost"></td>
+        <td id="this-year-cost-per-degree"></td>
+    </tr>
+
+    <tr>
+        <td id="last-year-comparison"></td>
+        <td id="last-year-gig-total"></td>
+        <td id="last-year-degree-total"></td>
+        <td id="last-year-total-cost"></td>
+        <td id="last-year-cost-per-degree"></td>
+    </tr>
+
+</table>
+
+
+
 
 <br>
 <br>
 
 <script>
     console.log(gigCountArray)
-    for (let i = 0; i < contractorIDArray.length; i++) {
+    for (let i = contractorIDArray.length; i >= 0; i--) {
         if (qa_contractorIDArray.indexOf(contractorIDArray[i]) >= 0) {
             console.log('there was a dupe: '+contractorIDArray[i])
             // removes the row in the regular contractor table
@@ -156,27 +228,59 @@
             // getting gig count from the QAer table of the duplicate contractor
             let addTheseQaerGigs = parseInt($(`#${contractorIDArray[i]}qaer-gig-count`).text())
             console.log(addTheseQaerGigs)
+            $(`#${contractorIDArray[i]}qaer-gig-count`).text(addTheseQaerGigs+gigCountArray[i])
 
             // getting kpi  count from the QAer table of the duplicate contractor
-            $(`#${contractorIDArray[i]}qaer-gig-count`).text(addTheseQaerGigs+gigCountArray[i])
             let addTheseQaerKpis = parseInt($(`#${contractorIDArray[i]}qaer-kpi-count`).text())
-
-        
             $(`#${contractorIDArray[i]}qaer-kpi-count`).text(addTheseQaerKpis+kpiArray[i])
+
             // redoing and replacing averages dupes
-            let newDegreePerHourAverage = (addTheseQaerKpis+gigCountArray[i]) / hoursArray[i]
+            let newDegreePerHourAverage = (addTheseQaerKpis+kpiArray[i]) / hoursArray[i]
             $(`#${contractorIDArray[i]}hour-qa`).text(newDegreePerHourAverage.toFixed(2));
+
             let newCostPerDegree = totalCostArray[i] / (addTheseQaerKpis+kpiArray[i])
-            //console.log(newCostPerDegree)
             $(`#${contractorIDArray[i]}cost-qa`).text('$'+newCostPerDegree.toFixed(2));
 
             // splicing/replacing the cost array entry with new average into qacontractoridarray
             qa_costArray.splice(qa_contractorIDArray.indexOf(contractorIDArray[i]), 1, newCostPerDegree)
 
+            //splice out the dupes kpis and other arrays
+
+            hoursArray.splice(i,1)
+            totalCostArray.splice(i,1)
+            gigCountArray.splice(i,1)
+            kpiArray.splice(i,1)
+
         }
     }
 
-    let totalKPI = kpiArray.reduce(function(a, b) {
+    let qaTotalHours = qa_totalHours.reduce(function(a, b) {
+        return a + b
+    }, 0);
+
+    let qaTotalCost = qa_totalCostArray.reduce(function(a, b) {
+        return a + b
+    }, 0);
+
+    let qaTotalGigs = qa_totalGigs.reduce(function(a, b) {
+        return a + b
+    }, 0);
+
+    let qaKPIArray = qa_kpiArray.reduce(function(a, b) {
+        return a + b
+    }, 0);
+
+    let qaDegreesPerHour = qaKPIArray / qaTotalHours;
+    let qaCostPerDegree = qaTotalCost / qaKPIArray;
+
+    $('#qa-total-hours').text(`${qaTotalHours.toFixed(2)}`);
+    $('#qa-total-cost').text(`$${qaTotalCost.toFixed(2)}`);
+    $('#qa-total-gigs').text(`${qaTotalGigs}`);
+    $('#qa-total-degrees').text(`${qaKPIArray}`);
+    $('#qa-degrees-per-hour').text(qaDegreesPerHour.toFixed(2));
+    $('#qa-cost-per-degree').text('$'+qaCostPerDegree.toFixed(2));
+
+    let totalHours = hoursArray.reduce(function(a, b) {
         return a + b
     }, 0);
 
@@ -184,8 +288,26 @@
         return a + b
     }, 0);
 
-    let averageCostPerKPI = totalCost / totalKPI
-    let highCostPerKPI = averageCostPerKPI * 1.5
+    let totalGigs = gigCountArray.reduce(function(a, b) {
+        return a + b
+    }, 0);
+
+    let totalKPI = kpiArray.reduce(function(a, b) {
+        return a + b
+    }, 0);
+
+    let averageDegreePerHours = totalKPI / totalHours;
+    let averageCostPerKPI = totalCost / totalKPI;
+
+    $('#total-hours').text(`${totalHours.toFixed(2)}`);
+    $('#total-cost').text(`$${totalCost.toFixed(2)}`);
+    $('#total-gigs').text(`${totalGigs}`);
+    $('#total-degrees').text(`${totalKPI}`);
+    $('#degrees-per-hour').text(averageDegreePerHours.toFixed(2));
+    $('#cost-per-degree').text('$'+averageCostPerKPI.toFixed(2));
+
+    let highCostPerKPI = averageCostPerKPI * 2
+    let highQACostPerKPI = qaCostPerDegree * 2
     console.log()
     console.log("cost per KPI too high: "+highCostPerKPI)
 
@@ -197,17 +319,44 @@
     }
 
     for (let i = 0; i < qa_contractorIDArray.length; i++) {
-    if (qa_costArray[i] > highCostPerKPI) {
+        if (qa_costArray[i] > highQACostPerKPI) {
             console.log(`${qa_costArray[i]} -- QAer contractor: ${qa_contractorIDArray[i]}`)
 
             $(`#${qa_contractorIDArray[i]}cost-qa`).attr('style', 'background-color: red')
         }
     }
 
+    let isYear = "{{ date.year }}"; 
     let isQuarter = "{{ date.quarter }}";
     let isMonth = "{{ date.month }}";
     let link = "";
     let localLink = "";
+
+    // doing math for the year comparison table
+    let thisYearDegreeTotal = "{{ data_total.totalDegreesCurrentYear }}";
+    let thisYearGigTotal = "{{ data_total.totalGigsCurrentYear }}";
+    let thisYearQADegreeTotal = "{{ qa_data_total.totalQADegreesCurrentYear }}";
+    let thisYearQAGigTotal = "{{ qa_data_total.totalQAGigsCurrentYear }}";
+    let thisYearTotalCost = "{{ upwork_data_current_year.totalCharges }}";
+
+    let lastYearDegreeTotal = "{{ data_total_previous_year.totalDegreesPreviousYear }}";
+    let lastYearGigTotal = "{{ data_total_previous_year.totalGigsPreviousYear }}";
+    let lastYearQADegreeTotal = "{{ qa_data_total_previous_year.totalDegreesPreviousYear }}";
+    let lastYearQAGigTotal = "{{ qa_data_total_previous_year.totalGigsPreviousYear }}";
+    let lastYearTotalCost = "{{ upwork_data_last_year.totalCharges }}"; 
+
+    $("#this-year-comparison").text(isYear);
+    $("#this-year-gig-total").text(parseInt(thisYearGigTotal)+parseInt(thisYearQAGigTotal));
+    $("#this-year-degree-total").text(parseInt(thisYearDegreeTotal)+parseInt(thisYearQADegreeTotal));
+    $("#this-year-total-cost").text("$"+parseInt(thisYearTotalCost));
+    $("#this-year-cost-per-degree").text("$"+(parseInt(thisYearTotalCost)/(parseInt(thisYearDegreeTotal)+parseInt(thisYearQADegreeTotal))).toFixed(2));
+
+
+    $("#last-year-comparison").text(isYear-1);
+    $("#last-year-gig-total").text(parseInt(lastYearGigTotal)+parseInt(lastYearQAGigTotal));
+    $("#last-year-degree-total").text(parseInt(lastYearDegreeTotal)+parseInt(lastYearQADegreeTotal));
+    $("#last-year-total-cost").text("$"+parseInt(lastYearTotalCost));
+    $("#last-year-cost-per-degree").text("$"+(parseInt(lastYearTotalCost)/(parseInt(lastYearDegreeTotal)+parseInt(lastYearQAGigTotal))).toFixed(2));
 
     $("#degreecollection-button").attr('style', 'background-color: white; color: gray;')
 

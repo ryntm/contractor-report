@@ -13,6 +13,7 @@ var db = require("./models")
 
 var input = fs.createReadStream("./db/csv/admin-gig-data.csv");
 var input2 = fs.createReadStream("./db/csv/upwork-data.csv");
+var input3 = fs.createReadStream("./db/csv/outreach-gig-data.csv")
 var parser = csv.parse({
   // what to parse by
   delimiter: ",",
@@ -25,10 +26,17 @@ var parser2 = csv.parse({
   // object literals instead of arrays
   columns: true
 });
+var parser3 = csv.parse({
+  // what to parse by
+  delimiter: ",",
+  // object literals instead of arrays
+  columns: true
+});
 
 //setting arrays for gig and upwork csv parser results.
 var results = [];
 var upworkResults = [];
+var outreachResults = [];
 
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/contractordb", { useNewUrlParser: true });
 
@@ -76,6 +84,26 @@ connection.once('open', () => {
                 db.UpworkData.create(upworkResults)
                 .then(res => {
                   console.log(`${upworkResults.length} documents added to upworkdatas collection`)
+                })
+                .catch(({ message }) => {
+                  console.log(message);
+                });
+              });
+          }
+        })
+        db.GigDataOutreach.deleteMany({}, (err, res) => {
+          if (err) {
+            console.log(err) 
+          } else {
+            console.log(`gigdatas-outreach collection was dropped.`)
+            //outreach gig data
+            input3
+            .pipe(parser3)
+            .on('data', (data3) => {outreachResults.push(data3);})
+            .on('end', () => {
+                db.GigDataOutreach.create(outreachResults)
+                .then(res => {
+                  console.log(`${outreachResults.length} documents added to gigdatas-outreach collection`)
                 })
                 .catch(({ message }) => {
                   console.log(message);
@@ -285,6 +313,7 @@ app.get('/year/:year/month/:month/degreecollection', (req, res) => {
 
 // degree by month api
 app.get('/api/year/:year/month/:month/degreecollection', (req, res) => {
+  // degree by month - submitted data
   db.GigData.aggregate([
     { "$match": { submitted_year: parseInt(req.params.year), submitted_month: parseInt(req.params.month), type: "Gig::DegreeCollection" }}
     ,
@@ -318,6 +347,7 @@ app.get('/api/year/:year/month/:month/degreecollection', (req, res) => {
     if (err) {
       console.log(err);
     } else {
+      // degree by month - qa_submitted data
       db.GigData.aggregate([
         { "$match": { qa_submitted_year: parseInt(req.params.year), qa_submitted_month: parseInt(req.params.month), type: "Gig::DegreeCollection" }},
         { $lookup: {
@@ -362,6 +392,7 @@ app.get('/api/year/:year/month/:month/degreecollection', (req, res) => {
 
 // degree by quarter render
 app.get('/year/:year/quarter/:quarter/degreecollection', (req, res) => {
+  // degree by quarter - submitted data
   db.GigData.aggregate([
     { "$match": { submitted_year: parseInt(req.params.year), submitted_quarter: parseInt(req.params.quarter), type: "Gig::DegreeCollection" }},
     { $lookup: {
@@ -425,17 +456,205 @@ app.get('/year/:year/quarter/:quarter/degreecollection', (req, res) => {
         , (err, qa_data) => {
         if (err) {
           console.log(err);
-        } 
-        console.log(qa_data)
-        res.render('degreecollection', { data: data, qa_data: qa_data, date: {year: req.params.year, quarter: req.params.quarter}, type: { type: "degreecollection"}});      });
-    }
-    // console.log(data)
-    // res.render('degreecollection', { data: data, date: {year: req.params.year, month: req.params.month}, type: { type: "degreecollection"}});
-  });
-});
+        } else {
+      // degree by quarter - qa_submitted data over all. 
+      db.GigData.aggregate([
+        { "$match": { $or: [
+          { $and: [
+            { qa_submitted_year: { $gt: 0 } }, 
+            { qa_submitted_year: { $lte: parseInt(req.params.year)-1 } }, 
+            {type: "Gig::DegreeCollection" }
+          ]}
+          ,
+          { $and: [
+            { qa_submitted_year: parseInt(req.params.year) }, 
+            { qa_submitted_quarter: { $lte: parseInt(req.params.quarter) }}, 
+            {type: "Gig::DegreeCollection" }
+          ]}
+        ]}
+      }
+      ,
+      { $group: {
+        _id: 0,
+        totalQAGigsCurrentYear: { $sum: 1 },
+        totalQADegreesCurrentYear: { $sum: "$degree_gig_count"}
+      }}
+    ], (err, qa_data_total_current_year) => {
+          if (err) {
+            console.log(err);
+          } else {
+          // degree by quarter - submitted data
+          db.GigData.aggregate([
+            { "$match": { $or: [
+              { $and: [
+                { submitted_year: { $gt: 0 } }, 
+                { submitted_year: { $lte: parseInt(req.params.year)-1 } }, 
+                {type: "Gig::DegreeCollection" }
+              ]}
+              ,
+              { $and: [
+                { submitted_year: parseInt(req.params.year) }, 
+                { submitted_quarter: { $lte: parseInt(req.params.quarter) }}, 
+                {type: "Gig::DegreeCollection" }
+              ]}
+            ]}
+        }
+        ,
+        { $group: {
+          _id: 0,
+          totalGigsCurrentYear: { $sum: 1 },
+          totalDegreesCurrentYear: { $sum: "$degree_gig_count"}
+        }}
+       ]
+            , (err, data_total_current_year) => {
+              if (err) {
+                console.log(err);
+              } else {
+                // degree by quarter - qa submitted data from the previous year
+                db.GigData.aggregate([
+                  { "$match": { $or: [
+                    { $and: [
+                      { qa_submitted_year: { $gt: 0 } }, 
+                      { qa_submitted_year: { $lte: parseInt(req.params.year)-2 } }, 
+                      {type: "Gig::DegreeCollection" }
+                    ]}
+                    ,
+                    { $and: [
+                      { qa_submitted_year: parseInt(req.params.year-1) }, 
+                      { qa_submitted_quarter: { $lte: parseInt(req.params.quarter) }}, 
+                      {type: "Gig::DegreeCollection" }
+                    ]}
+                ]}}
+                ,
+                { $group: {
+                  _id: 0,
+                  totalGigsPreviousYear: { $sum: 1 },
+                  totalDegreesPreviousYear: { $sum: "$degree_gig_count"}
+                }}
+              ], 
+                (err, qa_data_total_previous_year) => {
+                  if (err) {
+                    console.log(err);
+                  } else {
+                    // degree by quarter - submitted data from the previous year
+                    db.GigData.aggregate([
+                      { "$match": { $or: [
+                        { $and: [
+                          { submitted_year: { $gt: 0 } }, 
+                          { submitted_year: { $lte: parseInt(req.params.year)-2 } }, 
+                          {type: "Gig::DegreeCollection" }
+                        ]}
+                        ,
+                        { $and: [
+                          { submitted_year: parseInt(req.params.year-1) }, 
+                          { submitted_quarter: { $lte: parseInt(req.params.quarter) }}, 
+                          {type: "Gig::DegreeCollection" }
+                        ]}
+                    ]}}
+                    ,
+                    { $group: {
+                      _id: 0,
+                      totalGigsPreviousYear: { $sum: 1 },
+                      totalDegreesPreviousYear: { $sum: "$degree_gig_count"}
+                    }}
+                  ], 
+                    (err, data_total_previous_year) => {
+                      if (err) {
+                        console.log(err);
+                      } else {
+                        // upwork data for this year
+                        db.UpworkData.aggregate([
+                          { "$match": { $or: [
+                            { $and: [
+                              { year: { $gt: 0 } }, 
+                              { year: { $lte: parseInt(req.params.year)-1 } }, 
+                              { activity: "MegaDegreeCollection" }
+                            ]}
+                            ,
+                            { $and: [
+                              { year: parseInt(req.params.year) }, 
+                              { quarter: { $lte: parseInt(req.params.quarter) }}, 
+                              { activity: "MegaDegreeCollection" }
+                            ]}
+                        ]}}
+                        ,
+                        { $group: {
+                          _id: 0,
+                          totalCharges: { $sum: "$totalcharges"}
+                        }}
+                      ],
+                        (err, upwork_data_current_year) => {
+                          if (err) {
+                            console.log(err);
+                          } else {
+                          db.UpworkData.aggregate([
+                            { "$match": { $or: [
+                              { $and: [
+                                { year: { $gt: 0 } }, 
+                                { year: { $lte: parseInt(req.params.year)-2 } }, 
+                                { activity: "MegaDegreeCollection" }
+                              ]}
+                              ,
+                              { $and: [
+                                { year: parseInt(req.params.year)-1 }, 
+                                { quarter: { $lte: parseInt(req.params.quarter) }}, 
+                                { activity: "MegaDegreeCollection" }
+                              ]}
+                          ]}}
+                          ,
+                          { $group: {
+                            _id: 0,
+                            totalCharges: { $sum: "$totalcharges"}
+                          }}
+                        ],
+                          (err, upwork_data_last_year) => {
+                            if (err) {
+                              console.log(err);
+                            } else {
+                              res.render('degreecollection', { 
+                                data: data, 
+                                qa_data: qa_data, 
+                                data_total: data_total_current_year[0], 
+                                qa_data_total: qa_data_total_current_year[0], 
+                                data_total_previous_year: data_total_previous_year[0], 
+                                qa_data_total_previous_year: qa_data_total_previous_year[0], 
+                                upwork_data_current_year: upwork_data_current_year[0], 
+                                upwork_data_last_year: upwork_data_last_year[0], 
+                                type: { type: { type: "degreecollection"}}, 
+                                date: {year: req.params.year, quarter: req.params.quarter}});
+                          }
+                          }
+                          )
+                      }
+                      }
+                      )
+                  }
+                  }
+                  )
+              }
+              }
+              )
+          }
+          }
+          )
+      }
+      }
+      )
+  }
+  }
+  )
+
+}
+}
+)
+
+}
+);
+
 
 // degree by quarter api
 app.get('/api/year/:year/quarter/:quarter/degreecollection', (req, res) => {
+  // degree by quarter - submitted data
   db.GigData.aggregate([
     { "$match": { submitted_year: parseInt(req.params.year), submitted_quarter: parseInt(req.params.quarter), type: "Gig::DegreeCollection" }},
     { $lookup: {
@@ -461,16 +680,238 @@ app.get('/api/year/:year/quarter/:quarter/degreecollection', (req, res) => {
     degree_gig_count: { $sum: "$degree_gig_count"},
     distinctCount: { $sum: 1 } } 
     },
-    { $sort: {"distinctCount": -1 } }
+    { $sort: {"degree_gig_count": -1 } }
 
   ]
-    , (err, data) => {
+  , (err, data) => {
     if (err) {
       console.log(err);
-    } else 
-    res.json(data);
-  });
-});
+    } else {
+      db.GigData.aggregate([
+        { "$match": { qa_submitted_year: parseInt(req.params.year), qa_submitted_quarter: parseInt(req.params.quarter), type: "Gig::DegreeCollection" }},
+        { $lookup: {
+          from: "upworkdatas",
+          let: { gig_user_id: "$qa_owner_id"},
+          pipeline: [
+            { "$match": 
+            { 
+              $and: [
+                  { year: parseInt(req.params.year), quarter: parseInt(req.params.quarter), activity: "MegaDegreeCollection" }
+                  ,
+                  { $expr: { $eq: ["$userId", "$$gig_user_id" ] } }
+                ]
+              }
+          }
+          ],
+          as: "upworkData"
+        }},
+        { $group: { _id: "$qa_owner_id", 
+        name: { $first: "$qaer_name"},
+        totalhours: { $first: { $sum: "$upworkData.totalhours"}}, 
+        totalcharges: { $first: { $sum: "$upworkData.totalcharges"}}, 
+        degree_gig_count: { $sum: "$degree_gig_count"},
+        distinctCount: { $sum: 1 } } 
+        },
+        { $sort: {"distinctCount": -1 } }
+    
+      ]
+        , (err, qa_data) => {
+        if (err) {
+          console.log(err);
+        } else {
+      // degree by quarter - qa_submitted data over all. 
+      db.GigData.aggregate([
+        { "$match": { $or: [
+          { $and: [
+            { qa_submitted_year: { $gt: 0 } }, 
+            { qa_submitted_year: { $lte: parseInt(req.params.year)-1 } }, 
+            {type: "Gig::DegreeCollection" }
+          ]}
+          ,
+          { $and: [
+            { qa_submitted_year: parseInt(req.params.year) }, 
+            { qa_submitted_quarter: { $lte: parseInt(req.params.quarter) }}, 
+            {type: "Gig::DegreeCollection" }
+          ]}
+        ]}
+      }
+      ,
+      { $group: {
+        _id: 0,
+        totalQAGigsCurrentYear: { $sum: 1 },
+        totalQADegreesCurrentYear: { $sum: "$degree_gig_count"}
+      }}
+    ], (err, qa_data_total_current_year) => {
+          if (err) {
+            console.log(err);
+          } else {
+          // degree by quarter - submitted data
+          db.GigData.aggregate([
+            { "$match": { $or: [
+              { $and: [
+                { submitted_year: { $gt: 0 } }, 
+                { submitted_year: { $lte: parseInt(req.params.year)-1 } }, 
+                {type: "Gig::DegreeCollection" }
+              ]}
+              ,
+              { $and: [
+                { submitted_year: parseInt(req.params.year) }, 
+                { submitted_quarter: { $lte: parseInt(req.params.quarter) }}, 
+                {type: "Gig::DegreeCollection" }
+              ]}
+            ]}
+        }
+        ,
+        { $group: {
+          _id: 0,
+          totalGigsCurrentYear: { $sum: 1 },
+          totalDegreesCurrentYear: { $sum: "$degree_gig_count"}
+        }}
+       ]
+            , (err, data_total_current_year) => {
+              if (err) {
+                console.log(err);
+              } else {
+                // degree by quarter - qa submitted data from the previous year
+                db.GigData.aggregate([
+                  { "$match": { $or: [
+                    { $and: [
+                      { qa_submitted_year: { $gt: 0 } }, 
+                      { qa_submitted_year: { $lte: parseInt(req.params.year)-2 } }, 
+                      { type: "Gig::DegreeCollection" }
+                    ]}
+                    ,
+                    { $and: [
+                      { qa_submitted_year: parseInt(req.params.year-1) }, 
+                      { qa_submitted_quarter: { $lte: parseInt(req.params.quarter) }}, 
+                      { type: "Gig::DegreeCollection" }
+                    ]}
+                ]}}
+                ,
+                { $group: {
+                  _id: 0,
+                  totalGigsPreviousYear: { $sum: 1 },
+                  totalDegreesPreviousYear: { $sum: "$degree_gig_count"}
+                }}
+              ], 
+                (err, qa_data_total_previous_year) => {
+                  if (err) {
+                    console.log(err);
+                  } else {
+                    // degree by quarter - submitted data from the previous year
+                    db.GigData.aggregate([
+                      { "$match": { $or: [
+                        { $and: [
+                          { submitted_year: { $gt: 0 } }, 
+                          { submitted_year: { $lte: parseInt(req.params.year)-2 } }, 
+                          { type: "Gig::DegreeCollection" }
+                        ]}
+                        ,
+                        { $and: [
+                          { submitted_year: parseInt(req.params.year-1) }, 
+                          { submitted_quarter: { $lte: parseInt(req.params.quarter) }}, 
+                          { type: "Gig::DegreeCollection" }
+                        ]}
+                    ]}}
+                    ,
+                    { $group: {
+                      _id: 0,
+                      totalGigsPreviousYear: { $sum: 1 },
+                      totalDegreesPreviousYear: { $sum: "$degree_gig_count"}
+                    }}
+                  ], 
+                    (err, data_total_previous_year) => {
+                      if (err) {
+                        console.log(err);
+                      } else {
+                        // upwork data for this year
+                        db.UpworkData.aggregate([
+                          { "$match": { $or: [
+                            { $and: [
+                              { year: { $gt: 0 } }, 
+                              { year: { $lte: parseInt(req.params.year)-1 } }, 
+                              { activity: "MegaDegreeCollection" }
+                            ]}
+                            ,
+                            { $and: [
+                              { year: parseInt(req.params.year) }, 
+                              { quarter: { $lte: parseInt(req.params.quarter) }}, 
+                              { activity: "MegaDegreeCollection" }
+                            ]}
+                        ]}}
+                        ,
+                        { $group: {
+                          _id: 0,
+                          totalCharges: { $sum: "$totalcharges"}
+                        }}
+                      ],
+                        (err, upwork_data_current_year) => {
+                          if (err) {
+                            console.log(err);
+                          } else {
+                          db.UpworkData.aggregate([
+                            { "$match": { $or: [
+                              { $and: [
+                                { year: { $gt: 0 } }, 
+                                { year: { $lte: parseInt(req.params.year)-2 } }, 
+                                { activity: "MegaDegreeCollection" }
+                              ]}
+                              ,
+                              { $and: [
+                                { year: parseInt(req.params.year)-1 }, 
+                                { quarter: { $lte: parseInt(req.params.quarter) }}, 
+                                { activity: "MegaDegreeCollection" }
+                              ]}
+                          ]}}
+                          ,
+                          { $group: {
+                            _id: 0,
+                            totalCharges: { $sum: "$totalcharges"}
+                          }}
+                        ],
+                          (err, upwork_data_last_year) => {
+                            if (err) {
+                              console.log(err);
+                            } else {
+                              res.json({ 
+                                data: data, 
+                                qa_data: qa_data, 
+                                data_total: data_total_current_year[0], 
+                                qa_data_total: qa_data_total_current_year[0], 
+                                data_total_previous_year: data_total_previous_year[0], 
+                                qa_data_total_previous_year: qa_data_total_previous_year[0], 
+                                upwork_data_current_year: upwork_data_current_year[0], 
+                                upwork_data_last_year: upwork_data_last_year[0], 
+                                type: { type: { type: "degreecollection"}}, 
+                                date: {year: req.params.year, quarter: req.params.quarter}});
+                          }
+                          }
+                          )
+                      }
+                      }
+                      )
+                  }
+                  }
+                  )
+              }
+              }
+              )
+          }
+          }
+          )
+      }
+      }
+      )
+  }
+  }
+  )
+
+}
+}
+)
+
+}
+);
 
 // tuition by year render
 app.get('/year/:year/tuitioncollection', (req, res) => {
@@ -759,5 +1200,4 @@ app.listen(PORT, function() {
       PORT,
       PORT
     );
-  // });
 });

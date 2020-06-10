@@ -1,4 +1,4 @@
-date,year,quarter,month,team,name,username,agency,contract,activity,activitydescription,type,totalhours,manualhours,totalcharges,manualcharges,userId
+﻿date,year,quarter,month,team,name,username,agency,contract,activity,activitydescription,type,totalhours,manualhours,totalcharges,manualcharges,userId
 6/1/2012,2012,2,6,Content,Paula Maling,pmaling,,Student Reviews Manager,Reviews,Reviews: Review and publish user-submitted reviews.,Hourly,1,1,13.33,13.33,0
 6/1/2012,2012,2,6,SR Education Group,Paula Maling,pmaling,,Content Assistant - FAQs,Reviews,Reviews: Review and publish user-submitted reviews.,Hourly,1.17,0,19.45,0,0
 6/1/2012,2012,2,6,Content,Paula Maling,pmaling,,Student Reviews Manager,,,Hourly,5.67,1,75.54,13.33,0
@@ -3944,3 +3944,60 @@ date,year,quarter,month,team,name,username,agency,contract,activity,activitydesc
 4/1/2020,2020,2,4,Data,Rachel Nelson-Schille,rachelns,,Data Collection Freelancer - SR,reviews,approve user reviews,Hourly,10,0,195,0,26847
 4/1/2020,2020,2,4,Content,Greg Brecht,brechtg,,Freelancer Needed to Write High Quality Web Content,Writing,Helping with writing/editing tasks,Hourly,127.500001,0,2549.999999,0,26793
 4/1/2020,2020,2,4,Content,Miriam Schwartz,miriamjschwartz,,SR Writing,Writing,Helping with writing/editing tasks,Hourly,91.166667,0,2279.166667,0,26675
+5/1/2020,2020,2,5,Content,Jonnah Zabala,jaizabala,,Detail Oriented Content Contractors Needed,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,124.333334,0,794.49,0,26685
+5/1/2020,2020,2,5,Content,Greg Brecht,brechtg,,Freelancer Needed to Write High Quality Web Content,Writing,Helping with writing/editing tasks,Hourly,23.666667,0,473.333333,0,26793
+5/1/2020,2020,2,5,Data,Jyoti Sulgaonkar,jyotisulg,,Data Collection Freelancer,CollegeTuition,Tuition collection for College Tuition gigs,Hourly,0.666667,0,13.666667,0,26702
+5/1/2020,2020,2,5,Data,Jyoti Sulgaonkar,jyotisulg,,Data Collection Freelancer,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,25.333333,0,519.333333,0,26702
+5/1/2020,2020,2,5,Data,Cheryl Lim,cherylsylim,,Data Collection Freelancer - SR,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,75.499998,0,1434.499998,0,26841
+5/1/2020,2020,2,5,Data,Grace Carlson,gracieac,,Data Collection Freelancer,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,81.166666,0,1846.541666,0,26645
+5/1/2020,2020,2,5,Data,Grace Carlson,gracieac,,Data Collection Freelancer,RankingContacts,Collecting contacts for ranking schools.,Hourly,0.833334,0,18.958334,0,26645
+5/1/2020,2020,2,5,QA Team,Brittany France,brittany_france,,Data Collection Freelancer - Quality Assurance,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,38,0,845.5,0,26770
+5/1/2020,2020,2,5,QA Team,Brittany France,brittany_france,,Data Collection Freelancer - Quality Assurance,RankingContacts,Collecting contacts for ranking schools.,Hourly,1.833333,0,40.791667,0,26770
+5/1/2020,2020,2,5,QA Team,Michelle Wilkerson,mwilkerson2,,Researcher and Marketing Specialist,BestPageGigs,Working on best page gigs in outreach system.,Hourly,7.333334,0,154,0,26591
+5/1/2020,2020,2,5,QA Team,Michelle Wilkerson,mwilkerson2,,Researcher and Marketing Specialist,GeneralResearch,"For small projects, use activity when advised",Hourly,7.333333,0,154,0,26591
+5/1/2020,2020,2,5,Data-Colorado,Marissa W.,mwilkerson,,Research and Backlink Analysis,BestPageGigs,Working on best page gigs in outreach system.,Hourly,24.666666,0,518,0,300
+5/1/2020,2020,2,5,Data-Colorado,Marissa W.,mwilkerson,,Research and Backlink Analysis,GeneralResearch,"For small projects, use activity when advised",Hourly,23.166668,0,486.5,0,300
+5/1/2020,2020,2,5,Data-Colorado,Marissa W.,mwilkerson,,Research and Backlink Analysis,RankingContacts,Collecting contacts for ranking schools.,Hourly,2.666667,0,56,0,300
+5/1/2020,2020,2,5,QA Team,Masako Kobayashi,masakok,,Data Collection Freelancer - Quality Assurance,CollegeTuition,Tuition collection for College Tuition gigs,Hourly,0.666666,0,15.166666,0,26635
+5/1/2020,2020,2,5,QA Team,Masako Kobayashi,masakok,,Data Collection Freelancer - Quality Assurance,GeneralResearch,"For small projects, use activity when advised",Hourly,18.499999,0,420.874999,0,26635
+5/1/2020,2020,2,5,QA Team,Masako Kobayashi,masakok,,Data Collection Freelancer - Quality Assurance,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,30.500002,0,693.875002,0,26635
+5/1/2020,2020,2,5,QA Team,Masako Kobayashi,masakok,,Data Collection Freelancer - Quality Assurance,RankingContacts,Collecting contacts for ranking schools.,Hourly,0.333333,0,7.583333,0,26635
+5/1/2020,2020,2,5,Data,Nancy Kuclo,nkuclo,,Data Collection Freelancer,GeneralResearch,"For small projects, use activity when advised",Hourly,33.333334,0,616.666666,0,26721
+5/1/2020,2020,2,5,Data,Nancy Kuclo,nkuclo,,Data Collection Freelancer,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,87.333332,0,1615.666668,0,26721
+5/1/2020,2020,2,5,Data,Cristina Albarico - Fille,albaricocristina,,Data Collection Freelancer,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,135.833334,0,2377.083334,0,26817
+5/1/2020,2020,2,5,Data,Mfonabasi Ikpeikpe,fab1993,,Data Collection Freelancer - SR,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,37.166668,0,631.833332,0,26842
+5/1/2020,2020,2,5,Data,Margaret Bello,garetbello,,Data Collection Freelancer - SR,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,95.999998,0,1679.999998,0,26829
+5/1/2020,2020,2,5,Data,Divya Vinu,divyasasidharan,,Data Collection Freelancer,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,89.833335,0,1527.166665,0,26822
+5/1/2020,2020,2,5,Data,Betty Kiser,jbkiser,,Data Collection Freelancer,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,40.333333,2.333333,776.416667,44.916667,26761
+5/1/2020,2020,2,5,Data,Betty Kiser,jbkiser,,Data Collection Freelancer,RankingContacts,Collecting contacts for ranking schools.,Hourly,0.333333,0,6.416667,0,26761
+5/1/2020,2020,2,5,Data,Kelly Barnes,azfreelance4btc,,Data Collection Freelancer,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,101.333334,0,1722.666666,0,26821
+5/1/2020,2020,2,5,Data,Jezza Ong,jezzaong,,Data Collection Freelancer,GeneralResearch,"For small projects, use activity when advised",Hourly,1.333333,0,24,0,26816
+5/1/2020,2020,2,5,Data,Jezza Ong,jezzaong,,Data Collection Freelancer,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,65.166665,0,1173,0,26816
+5/1/2020,2020,2,5,Data,Ruth A Perkins,perkinsrth,,Data Collection Freelancer,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,17.666669,0,326.833331,0,26682
+5/1/2020,2020,2,5,Data,Danica Mai Dela Cruz,danica_mai,,Data Collection Freelancer,RankingContacts,Collecting contacts for ranking schools.,Hourly,67.833333,0,1339.708333,0,26718
+5/1/2020,2020,2,5,Data,Cynthia Sara Snyder,cindysnyder83,,Data Collection Freelancer,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,44.5,0,923.375,0,26765
+5/1/2020,2020,2,5,QA Team,Gabrielle Calvillo,gabbiecalvillo,,Data Collection Freelancer - Quality Assurance,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,44.333332,0,919.916668,0,26670
+5/1/2020,2020,2,5,Data,Shelley Ockwell,ockwell-shelley,,Data Collection Freelancer - SR,BestPageGigs,Working on best page gigs in outreach system.,Hourly,0.5,0,9.75,0,26803
+5/1/2020,2020,2,5,Data,Shelley Ockwell,ockwell-shelley,,Data Collection Freelancer - SR,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,41.833334,0,815.75,0,26803
+5/1/2020,2020,2,5,Data,Gaithri Raj,gaithriraj,,Data Collection Freelancer,GeneralResearch,"For small projects, use activity when advised",Hourly,72.333333,0,1356.25,0,26763
+5/1/2020,2020,2,5,Data,Gaithri Raj,gaithriraj,,Data Collection Freelancer,RankingContacts,Collecting contacts for ranking schools.,Hourly,14.333334,0,268.75,0,26763
+5/1/2020,2020,2,5,Data,Shawn Scattergood,shawnscattergood,,Data Collection Freelancer,BestPageGigs,Working on best page gigs in outreach system.,Hourly,19.833334,0,391.708334,0,26811
+5/1/2020,2020,2,5,Data,Shawn Scattergood,shawnscattergood,,Data Collection Freelancer,GeneralResearch,"For small projects, use activity when advised",Hourly,97.833336,0,1932.208336,0,26811
+5/1/2020,2020,2,5,Data,Shawn Scattergood,shawnscattergood,,Data Collection Freelancer,RankingContacts,Collecting contacts for ranking schools.,Hourly,3,0,59.25,0,26811
+5/1/2020,2020,2,5,Data,Rachel Nelson-Schille,rachelns,,Data Collection Freelancer - SR,GeneralResearch,"For small projects, use activity when advised",Hourly,70.5,0,1374.75,0,26847
+5/1/2020,2020,2,5,Data,Rachel Nelson-Schille,rachelns,,Data Collection Freelancer - SR,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,13.166667,0,256.75,0,26847
+5/1/2020,2020,2,5,Data,Rachel Nelson-Schille,rachelns,,Data Collection Freelancer - SR,reviews,approve user reviews,Hourly,2.333333,0,45.5,0,26847
+5/1/2020,2020,2,5,Data,Brandon Cullinan,bcullinan,,Data Collection Freelancer - SR,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,2.166667,0,42.25,0,26846
+5/1/2020,2020,2,5,Data,Hamda yusuf khahin,hamdayusuf,,Data Collection Freelancer,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,25.166666,0,440.416666,0,26720
+5/1/2020,2020,2,5,Data,Aranza Garcia,aranza-garcia,,Data Collection Freelancer,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,98.499997,0,1723.749997,0,26717
+5/1/2020,2020,2,5,Data,Leigh Tennison,latennison,,Data Collection Freelancer,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,34.833334,0,661.833334,0,26634
+5/1/2020,2020,2,5,Data,Larissa Vinci,larissavinci,,Data Collection Freelancer,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,136.499999,0,2354.625,0,26731
+5/1/2020,2020,2,5,Data,Kumari Sita,kumari07,,Data Collection Freelancer - SR,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,137.000001,0,2397.500001,0,26843
+5/1/2020,2020,2,5,Data,Karen Duong,kduong17,,Data Collection Freelancer - SR,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,18.500001,0,323.750001,0,26852
+5/1/2020,2020,2,5,Data,Penny Chavers,pchavers,,Data Collection Freelancer,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,115.333334,0,1989.5,0,26733
+5/1/2020,2020,2,5,Data,Valerie Cowden,rdharvey,,Data Collection Freelancer - SR,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,91.333335,0,1598.333335,0,26840
+5/1/2020,2020,2,5,Data,Maya Ibrahim,mydayin,,Data Collection Freelancer,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,131.166671,0,1705.166671,0,26704
+5/1/2020,2020,2,5,Content,Miriam Schwartz,miriamjschwartz,,SR Writing,Writing,Helping with writing/editing tasks,Hourly,119.499999,0,2987.499999,0,26675
+5/1/2020,2020,2,5,Data,Jennifer Bezirium,jenbez,,Data Collection Freelancer - SR,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,88.333334,0,1766.666666,0,26863
+5/1/2020,2020,2,5,SR Education Group,Cheyenne Bilbrey,cebilbrey,,Data Collection Freelancer - SR,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,40.500001,0,765.044999,0,26864
+5/1/2020,2020,2,5,Data,Karie Castillon,kariecastillon,,Data Collection Freelancer - SR,MegaDegreeCollection,Collection online degrees for over 400 schools,Hourly,74.000002,0,1257.999998,0,26865

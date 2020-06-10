@@ -57,35 +57,17 @@ const GigDataOutreachSchema = new Schema({
   qa_guide_admin: {
     type: Boolean
   },
-  qa_edits: {
+  college_contacts_count: {
     type: Number
   },
-  manager_edits: {
-    type: Number
+  company_contacts_count: {
+      type: Number
   },
-  college_id: {
-    type: Number
+  best_page_count: {
+      type: Number
   },
-  word_count_college_description: {
-    type: Number
-  },
-  word_count_rankings: {
-    type: Number
-  },
-  word_count_writings: {
-    type: Number
-  },
-  degree_gig_count: {
-    type: Number
-  },
-  tuition_degree_count: {
-    type: Number
-  },
-  tuition_cert_count: {
-    type: Number
-  },
-  classname_count: {
-    type: Number
+  product_id: {
+      type: String
   }
 });
 
