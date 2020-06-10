@@ -47,72 +47,72 @@ const connection = mongoose.connection;
 connection.once('open', () => {
   console.log('MongoDB connection successful.')
   // here to 
-  connection.db.listCollections().toArray((err, names) => {
-    if (err) {
-      console.log(`Error encountered: ${err}`);
-    } else {
-        db.GigData.deleteMany({}, (err, res) => {
-          if (err) {
-            console.log(err) 
-          } else {
-            console.log(`gigdatas collection was dropped.`)
-            // gig data
-          input
-          .pipe(parser)
-          .on('data', (data) => {results.push(data)})
-          .on('end', () => {
-              db.GigData.create(results)
-              .then(res => {
-                console.log(`${results.length} documents added to gigdatas collection`)
-              })
-              .catch(({ message }) => {
-                console.log(message);
-              });
-            });
-          }
-        })
-        db.UpworkData.deleteMany({}, (err, res) => {
-          if (err) {
-            console.log(err) 
-          } else {
-            console.log(`upworkdatas collection was dropped.`)
-            //upwork data
-            input2
-            .pipe(parser2)
-            .on('data', (data2) => {upworkResults.push(data2);})
-            .on('end', () => {
-                db.UpworkData.create(upworkResults)
-                .then(res => {
-                  console.log(`${upworkResults.length} documents added to upworkdatas collection`)
-                })
-                .catch(({ message }) => {
-                  console.log(message);
-                });
-              });
-          }
-        })
-        db.GigDataOutreach.deleteMany({}, (err, res) => {
-          if (err) {
-            console.log(err) 
-          } else {
-            console.log(`gigdatas-outreach collection was dropped.`)
-            //outreach gig data
-            input3
-            .pipe(parser3)
-            .on('data', (data3) => {outreachResults.push(data3);})
-            .on('end', () => {
-                db.GigDataOutreach.create(outreachResults)
-                .then(res => {
-                  console.log(`${outreachResults.length} documents added to gigdatas-outreach collection`)
-                })
-                .catch(({ message }) => {
-                  console.log(message);
-                });
-              });
-          }
-        })
-    }
-  })
+  // connection.db.listCollections().toArray((err, names) => {
+  //   if (err) {
+  //     console.log(`Error encountered: ${err}`);
+  //   } else {
+  //       db.GigData.deleteMany({}, (err, res) => {
+  //         if (err) {
+  //           console.log(err) 
+  //         } else {
+  //           console.log(`gigdatas collection was dropped.`)
+  //           // gig data
+  //         input
+  //         .pipe(parser)
+  //         .on('data', (data) => {results.push(data)})
+  //         .on('end', () => {
+  //             db.GigData.create(results)
+  //             .then(res => {
+  //               console.log(`${results.length} documents added to gigdatas collection`)
+  //             })
+  //             .catch(({ message }) => {
+  //               console.log(message);
+  //             });
+  //           });
+  //         }
+  //       })
+  //       db.UpworkData.deleteMany({}, (err, res) => {
+  //         if (err) {
+  //           console.log(err) 
+  //         } else {
+  //           console.log(`upworkdatas collection was dropped.`)
+  //           //upwork data
+  //           input2
+  //           .pipe(parser2)
+  //           .on('data', (data2) => {upworkResults.push(data2);})
+  //           .on('end', () => {
+  //               db.UpworkData.create(upworkResults)
+  //               .then(res => {
+  //                 console.log(`${upworkResults.length} documents added to upworkdatas collection`)
+  //               })
+  //               .catch(({ message }) => {
+  //                 console.log(message);
+  //               });
+  //             });
+  //         }
+  //       })
+  //       db.GigDataOutreach.deleteMany({}, (err, res) => {
+  //         if (err) {
+  //           console.log(err) 
+  //         } else {
+  //           console.log(`gigdatas-outreach collection was dropped.`)
+  //           //outreach gig data
+  //           input3
+  //           .pipe(parser3)
+  //           .on('data', (data3) => {outreachResults.push(data3);})
+  //           .on('end', () => {
+  //               db.GigDataOutreach.create(outreachResults)
+  //               .then(res => {
+  //                 console.log(`${outreachResults.length} documents added to gigdatas-outreach collection`)
+  //               })
+  //               .catch(({ message }) => {
+  //                 console.log(message);
+  //               });
+  //             });
+  //         }
+  //       })
+  //   }
+  // })
   // here to not import
 })
 
@@ -620,7 +620,7 @@ app.get('/year/:year/quarter/:quarter/degreecollection', (req, res) => {
                                 qa_data_total_previous_year: qa_data_total_previous_year[0], 
                                 upwork_data_current_year: upwork_data_current_year[0], 
                                 upwork_data_last_year: upwork_data_last_year[0], 
-                                type: { type: { type: "degreecollection"}}, 
+                                type: { type: "degreecollection"}, 
                                 date: {year: req.params.year, quarter: req.params.quarter}});
                           }
                           }
