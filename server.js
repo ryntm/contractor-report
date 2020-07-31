@@ -71,11 +71,11 @@ connection.once('open', () => {
             });
           }
         })
-        setTimeOut(
-          db.UpworkData.deleteMany({}, (err, res) => {
-            if (err) {
-              console.log(err) 
-            } else {
+        db.UpworkData.deleteMany({}, (err, res) => {
+          if (err) {
+            console.log(err) 
+          } else {
+            setTimeout(function() {
               console.log(`upworkdatas collection was dropped.`)
               //upwork data
               input2
@@ -90,15 +90,16 @@ connection.once('open', () => {
                   console.log(message);
                 });
               });
-            }
-          })
-          , 120
-          ) 
-        setTimeOut(
-          db.GigDataOutreach.deleteMany({}, (err, res) => {
-            if (err) {
-              console.log(err) 
-            } else {
+              }, 120
+              )
+          }
+        })
+        db.GigDataOutreach.deleteMany({}, (err, res) => {
+          if (err) {
+            console.log(err) 
+          } else {
+            setTimeout(function() {
+
               console.log(`gigdatas-outreach collection was dropped.`)
               //outreach gig data
               input3
@@ -113,10 +114,9 @@ connection.once('open', () => {
                   console.log(message);
                 });
               });
-            }
-          })
-          , 120
-          )
+            }, 240)
+          }
+        })
     }
   })
   // here to not import
