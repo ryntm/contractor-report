@@ -71,7 +71,7 @@ connection.once('open', () => {
             });
           }
         })
-        setTimeout(
+        setTimeOut(
           db.UpworkData.deleteMany({}, (err, res) => {
             if (err) {
               console.log(err) 
