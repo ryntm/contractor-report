@@ -71,16 +71,17 @@ connection.once('open', () => {
             });
           }
         })
-        db.UpworkData.deleteMany({}, (err, res) => {
-          if (err) {
-            console.log(err) 
-          } else {
-            console.log(`upworkdatas collection was dropped.`)
-            //upwork data
-            input2
-            .pipe(parser2)
-            .on('data', (data2) => {upworkResults.push(data2);})
-            .on('end', () => {
+        setTimeout(
+          db.UpworkData.deleteMany({}, (err, res) => {
+            if (err) {
+              console.log(err) 
+            } else {
+              console.log(`upworkdatas collection was dropped.`)
+              //upwork data
+              input2
+              .pipe(parser2)
+              .on('data', (data2) => {upworkResults.push(data2);})
+              .on('end', () => {
                 db.UpworkData.create(upworkResults)
                 .then(res => {
                   console.log(`${upworkResults.length} documents added to upworkdatas collection`)
@@ -89,18 +90,21 @@ connection.once('open', () => {
                   console.log(message);
                 });
               });
-          }
-        })
-        db.GigDataOutreach.deleteMany({}, (err, res) => {
-          if (err) {
-            console.log(err) 
-          } else {
-            console.log(`gigdatas-outreach collection was dropped.`)
-            //outreach gig data
-            input3
-            .pipe(parser3)
-            .on('data', (data3) => {outreachResults.push(data3);})
-            .on('end', () => {
+            }
+          })
+          , 120
+          ) 
+        setTimeOut(
+          db.GigDataOutreach.deleteMany({}, (err, res) => {
+            if (err) {
+              console.log(err) 
+            } else {
+              console.log(`gigdatas-outreach collection was dropped.`)
+              //outreach gig data
+              input3
+              .pipe(parser3)
+              .on('data', (data3) => {outreachResults.push(data3);})
+              .on('end', () => {
                 db.GigDataOutreach.create(outreachResults)
                 .then(res => {
                   console.log(`${outreachResults.length} documents added to gigdatas-outreach collection`)
@@ -109,8 +113,10 @@ connection.once('open', () => {
                   console.log(message);
                 });
               });
-          }
-        })
+            }
+          })
+          , 120
+          )
     }
   })
   // here to not import
