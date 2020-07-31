@@ -1,8 +1,5 @@
 const db = require("../models");
 //ensures a clean version of Op is required
-const Op = require("sequelize").Op;
-
-const isAuthenticated = require("../config/middleware/isAuthenticated");
 
 module.exports = function(app) {
   // ----  REPORT ROUTES----
