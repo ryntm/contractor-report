@@ -90,7 +90,7 @@ connection.once('open', () => {
                   console.log(message);
                 });
               });
-              }, 120
+              }, 120000
               )
           }
         })
@@ -99,7 +99,6 @@ connection.once('open', () => {
             console.log(err) 
           } else {
             setTimeout(function() {
-
               console.log(`gigdatas-outreach collection was dropped.`)
               //outreach gig data
               input3
@@ -114,7 +113,7 @@ connection.once('open', () => {
                   console.log(message);
                 });
               });
-            }, 240)
+            }, 24000)
           }
         })
     }
