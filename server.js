@@ -113,7 +113,7 @@ connection.once('open', () => {
                   console.log(message);
                 });
               });
-            }, 24000)
+            }, 240000)
           }
         })
     }
