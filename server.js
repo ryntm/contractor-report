@@ -90,7 +90,7 @@ connection.once('open', () => {
                   console.log(message);
                 });
               });
-              }, 120000
+              }, 240000
               )
           }
         })
@@ -113,7 +113,7 @@ connection.once('open', () => {
                   console.log(message);
                 });
               });
-            }, 240000)
+            }, 360000)
           }
         })
     }
