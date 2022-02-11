@@ -20,7 +20,7 @@
     "bcryptjs": "2.4.3",
     "csv": "^5.3.2",
     "express": "^4.17.0",
-    "express-handlebars": "^3.1.0",
+    "express-handlebars": "^5.3.1",
     "express-session": "^1.16.1",
     "mongodb": "^2.2.33",
     "mongoose": "^5.9.7",
